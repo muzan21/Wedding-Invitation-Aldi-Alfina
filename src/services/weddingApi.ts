@@ -26,6 +26,30 @@ import { slugifyGuestName } from '../utils/weddingLogic';
 
 // Session token held strictly in memory (never localStorage or sessionStorage)
 let adminBearerToken: string | null = null;
+const VERCEL_ADMIN_STORAGE_KEY = 'simanten_vercel_admin_account';
+
+interface StoredVercelAdmin {
+  username: string;
+  password: string;
+}
+
+function readVercelAdminAccount(): StoredVercelAdmin | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = window.localStorage.getItem(VERCEL_ADMIN_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as StoredVercelAdmin;
+    if (parsed?.username && parsed?.password) return parsed;
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+function writeVercelAdminAccount(account: StoredVercelAdmin): void {
+  if (typeof window === 'undefined') return;
+  window.localStorage.setItem(VERCEL_ADMIN_STORAGE_KEY, JSON.stringify(account));
+}
 
 export function setAdminToken(token: string | null): void {
   adminBearerToken = token;
@@ -219,36 +243,85 @@ export async function fetchAdminAuthStatus(): Promise<AdminAuthStatus> {
   if (adminBearerToken) {
     headers.Authorization = `Bearer ${adminBearerToken}`;
   }
-  const res = await fetch('/api/admin/auth/status', { headers });
-  return parseJsonOrThrow<AdminAuthStatus>(res);
+  try {
+    const res = await fetch('/api/admin/auth/status', { headers });
+    if (res.ok) {
+      return await parseJsonOrThrow<AdminAuthStatus>(res);
+    }
+  } catch {
+    // Fallback ke mode Vercel saat server Express tidak berjalan
+  }
+
+  const savedAccount = readVercelAdminAccount();
+  return {
+    needsSetup: !savedAccount,
+    usesEnvOverride: false,
+    authenticated: Boolean(adminBearerToken),
+    username: savedAccount?.username || 'admin',
+  };
 }
 
 export async function setupAdminAccount(
   username: string,
   password: string
 ): Promise<{ token: string; username: string }> {
-  const res = await fetch('/api/admin/auth/setup', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username, password }),
-  });
-  const data = await parseJsonOrThrow<{ token: string; username: string }>(res);
-  setAdminToken(data.token);
-  return data;
+  try {
+    const res = await fetch('/api/admin/auth/setup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password }),
+    });
+    if (res.ok) {
+      const data = await parseJsonOrThrow<{ token: string; username: string }>(res);
+      setAdminToken(data.token);
+      return data;
+    }
+  } catch {
+    // Fallback ke mode Vercel di bawah
+  }
+
+  const cleanUsername = username.trim() || 'admin';
+  writeVercelAdminAccount({ username: cleanUsername, password });
+  const token = `vercel_admin_${Date.now()}`;
+  setAdminToken(token);
+  return { token, username: cleanUsername };
 }
 
 export async function loginAdminAccount(
   username: string,
   password: string
 ): Promise<{ token: string; username: string }> {
-  const res = await fetch('/api/admin/auth/login', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username, password }),
-  });
-  const data = await parseJsonOrThrow<{ token: string; username: string }>(res);
-  setAdminToken(data.token);
-  return data;
+  try {
+    const res = await fetch('/api/admin/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password }),
+    });
+    if (res.ok) {
+      const data = await parseJsonOrThrow<{ token: string; username: string }>(res);
+      setAdminToken(data.token);
+      return data;
+    }
+  } catch {
+    // Fallback ke mode Vercel di bawah
+  }
+
+  const cleanUsername = username.trim() || 'admin';
+  const savedAccount = readVercelAdminAccount();
+  if (!savedAccount) {
+    writeVercelAdminAccount({ username: cleanUsername, password });
+    const token = `vercel_admin_${Date.now()}`;
+    setAdminToken(token);
+    return { token, username: cleanUsername };
+  }
+
+  if (savedAccount.username === cleanUsername && savedAccount.password === password) {
+    const token = `vercel_admin_${Date.now()}`;
+    setAdminToken(token);
+    return { token, username: cleanUsername };
+  }
+
+  throw new Error('Username atau password admin tidak sesuai.');
 }
 
 export async function logoutAdminAccount(): Promise<void> {
@@ -275,8 +348,27 @@ export async function changeAdminPassword(
 
 // --- Protected Admin Data APIs ---
 export async function fetchAdminBundle(): Promise<AdminBundle> {
-  const res = await fetch('/api/admin/bundle', { headers: authHeaders() });
-  return parseJsonOrThrow<AdminBundle>(res);
+  try {
+    const res = await fetch('/api/admin/bundle', { headers: authHeaders() });
+    if (res.ok) {
+      return await parseJsonOrThrow<AdminBundle>(res);
+    }
+  } catch {
+    // Fallback ke data store lokal saat di Vercel
+  }
+
+ const store = localStore as unknown as AdminBundle;
+  const wishesList = store.wishes || store.allWishes || [];
+  return {
+    config: store.config,
+    events: store.events || [],
+    gifts: store.gifts || [],
+    gallery: store.gallery || [],
+    wishes: wishesList,
+    allWishes: store.allWishes || wishesList,
+    rsvps: store.rsvps || [],
+    guests: store.guests || [],
+  };
 }
 
 export async function updateWeddingConfig(config: WeddingConfig): Promise<WeddingConfig> {
