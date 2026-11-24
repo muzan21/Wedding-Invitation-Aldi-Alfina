@@ -36,17 +36,17 @@
     "filterTitle": "Sflmzn",
     "filterDescription": "Bantu abadikan momen bahagia pada acara pernikahan kami, dengan menggunakan Filter Instagram di bawah ini:",
     "filterInstagramUrl": "https://www.instagram.com/saefulmzn?hvrq=NHhvNzcwemQ4cXJu",
-    "desktopSplitPhoto": "/uploads/1795506989869-7285a3fe35ea4267.webp",
-    "heroPhoto": "/uploads/1795507046755-c78ba838482cf505.webp",
-    "groomPhoto": "/uploads/1795514295525-c55547c0ea186861.png",
-    "bridePhoto": "/uploads/1795514062176-baa55d49879d9780.png",
-    "eventBackdropPhoto": "/uploads/1795514533777-00304085b07d8e3d.webp",
-    "wishesBackdropPhoto": "/uploads/1795514485578-f5b4f3f09bed288c.webp",
-    "closingBackdropPhoto": "/uploads/1795514506402-e006d58e7bb52038.webp",
-    "footerCouplePhoto": "/uploads/1795514516377-d6e4378ab184d081.webp",
+    "desktopSplitPhoto": "/media/uploads/1795506989869-7285a3fe35ea4267.webp",
+    "heroPhoto": "/media/uploads/1795507046755-c78ba838482cf505.webp",
+    "groomPhoto": "/media/uploads/1795514295525-c55547c0ea186861.png",
+    "bridePhoto": "/media/uploads/1795514062176-baa55d49879d9780.png",
+    "eventBackdropPhoto": "/media/uploads/1795514533777-00304085b07d8e3d.webp",
+    "wishesBackdropPhoto": "/media/uploads/1795514485578-f5b4f3f09bed288c.webp",
+    "closingBackdropPhoto": "/media/uploads/1795514506402-e006d58e7bb52038.webp",
+    "footerCouplePhoto": "/media/uploads/1795514516377-d6e4378ab184d081.webp",
     "musicEnabled": true,
     "musicAutoplayOnOpen": true,
-    "musicUrl": "/uploads/1795515837548-13514e099cca9535.mp3",
+    "musicUrl": "/media/uploads/1795515837548-13514e099cca9535.mp3",
     "musicTitle": "Nuca",
     "visibility": {
       "cover": true,
@@ -124,7 +124,7 @@
   "gallery": [
     {
       "id": "gal-mwuj6p7l-7cee38ab",
-      "url": "/uploads/1795514855435-81f54e7304cabe48.webp",
+      "url": "/media/uploads/1795514855435-81f54e7304cabe48.webp",
       "caption": "prewedd edited-08.jpg",
       "aspect": "portrait",
       "monochrome": false,
@@ -133,7 +133,7 @@
     },
     {
       "id": "gal-mwuj6tbf-0df4ce5d",
-      "url": "/uploads/1795514860756-a5beeba44cceca00.webp",
+      "url": "/media/uploads/1795514860756-a5beeba44cceca00.webp",
       "caption": "prewedd edited-15.jpg",
       "aspect": "portrait",
       "monochrome": false,
@@ -142,7 +142,7 @@
     },
     {
       "id": "gal-mwuj6xz7-52fb998a",
-      "url": "/uploads/1795514866793-f63d58335220b8cd.webp",
+      "url": "/media/uploads/1795514866793-f63d58335220b8cd.webp",
       "caption": "prewedd edited-02.jpg",
       "aspect": "portrait",
       "monochrome": false,
@@ -151,7 +151,7 @@
     },
     {
       "id": "gal-mwuj72ef-71d45d00",
-      "url": "/uploads/1795514872521-91c0529d34aca223.webp",
+      "url": "/media/uploads/1795514872521-91c0529d34aca223.webp",
       "caption": "prewedd edited-03.jpg",
       "aspect": "portrait",
       "monochrome": false,
@@ -160,7 +160,7 @@
     },
     {
       "id": "gal-mwuj77lp-b49477f0",
-      "url": "/uploads/1795514879265-7c48f6b987ea1bfb.webp",
+      "url": "/media/uploads/1795514879265-7c48f6b987ea1bfb.webp",
       "caption": "prewedd edited-17.jpg",
       "aspect": "portrait",
       "monochrome": false,
@@ -169,7 +169,7 @@
     },
     {
       "id": "gal-mwuj7x4n-79148b9b",
-      "url": "/uploads/1795514912349-a665dc2227d62b7b.webp",
+      "url": "/media/uploads/1795514912349-a665dc2227d62b7b.webp",
       "caption": "prewedd edited-12.jpg",
       "aspect": "portrait",
       "monochrome": false,
@@ -178,7 +178,7 @@
     },
     {
       "id": "gal-mwuj833q-1e45aa4b",
-      "url": "/uploads/1795514920093-04f17d7b55fd0cfb.webp",
+      "url": "/media/uploads/1795514920093-04f17d7b55fd0cfb.webp",
       "caption": "prewedd edited-01.jpg",
       "aspect": "portrait",
       "monochrome": false,
@@ -187,7 +187,7 @@
     },
     {
       "id": "gal-mwuj8ehn-680e14a9",
-      "url": "/uploads/1795514934847-0583201810bac17d.webp",
+      "url": "/media/uploads/1795514934847-0583201810bac17d.webp",
       "caption": "prewedd edited-11.jpg",
       "aspect": "portrait",
       "monochrome": false,
@@ -196,7 +196,7 @@
     },
     {
       "id": "gal-mwuj95to-8938ac24",
-      "url": "/uploads/1795514970100-afa55d265695188d.webp",
+      "url": "/media/uploads/1795514970100-afa55d265695188d.webp",
       "caption": "prewedd edited-13.jpg",
       "aspect": "portrait",
       "monochrome": false,
