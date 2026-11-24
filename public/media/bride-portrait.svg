@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800" width="600" height="800">
+  <defs>
+    <radialGradient id="bBg" cx="50%" cy="34%" r="68%">
+      <stop offset="0%" stop-color="#27231E"/>
+      <stop offset="56%" stop-color="#131210"/>
+      <stop offset="100%" stop-color="#070707"/>
+    </radialGradient>
+    <linearGradient id="bKebaya" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2B2620"/>
+      <stop offset="52%" stop-color="#141311"/>
+      <stop offset="100%" stop-color="#070707"/>
+    </linearGradient>
+    <linearGradient id="bFade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#080808" stop-opacity="0.1"/>
+      <stop offset="76%" stop-color="#080808" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#060606" stop-opacity="0.95"/>
+    </linearGradient>
+    <pattern id="bBatik" width="38" height="38" patternUnits="userSpaceOnUse" patternTransform="rotate(-24)">
+      <path d="M0 19 Q9.5 7 19 19 T38 19" fill="none" stroke="#B8A88A" stroke-opacity="0.24" stroke-width="1"/>
+      <circle cx="19" cy="19" r="1.7" fill="#B8A88A" fill-opacity="0.2"/>
+    </pattern>
+  </defs>
+  <rect width="600" height="800" fill="url(#bBg)"/>
+  <ellipse cx="300" cy="270" rx="200" ry="220" fill="#B8A88A" opacity="0.075"/>
+  <path d="M72 780 V260 C72 128 174 44 300 44 C426 44 528 128 528 260 V780" fill="none" stroke="#B8A88A" stroke-opacity="0.22" stroke-width="1.2"/>
+
+  <!-- Javanese Sanggul & Cunduk Mentul Filigree -->
+  <ellipse cx="222" cy="282" rx="44" ry="52" fill="#0E0D0B" stroke="#B8A88A" stroke-opacity="0.38" stroke-width="1.2"/>
+  <g stroke="#B8A88A" stroke-opacity="0.7" fill="none">
+    <path d="M276 196 Q262 142 246 108" stroke-width="1.3"/>
+    <path d="M300 188 Q300 132 300 94" stroke-width="1.3"/>
+    <path d="M324 196 Q338 142 354 108" stroke-width="1.3"/>
+    <circle cx="246" cy="106" r="6.5" fill="#B8A88A" fill-opacity="0.42"/>
+    <circle cx="300" cy="92" r="7.5" fill="#B8A88A" fill-opacity="0.52"/>
+    <circle cx="354" cy="106" r="6.5" fill="#B8A88A" fill-opacity="0.42"/>
+  </g>
+
+  <!-- Sculpted Bride Chiaroscuro Portrait -->
+  <path d="M234 268 C234 206 266 178 304 178 C344 178 374 210 372 268 C370 322 344 364 302 368 C260 364 234 320 234 268 Z" fill="#141311" stroke="#B8A88A" stroke-opacity="0.46" stroke-width="1.3"/>
+  <!-- Graceful Kebaya / Kemben Silhouette -->
+  <path d="M268 364 L336 364 C344 404 374 432 418 456 C468 484 494 554 500 660 L506 800 L94 800 L100 660 C106 554 132 484 182 456 C226 432 256 404 268 364 Z" fill="url(#bKebaya)" stroke="#B8A88A" stroke-opacity="0.34" stroke-width="1.2"/>
+  <path d="M138 518 C206 544 394 544 462 518 L496 800 L104 800 Z" fill="url(#bBatik)"/>
+  <!-- Kalung Sungsang tiered bridal necklace -->
+  <path d="M236 426 Q302 492 368 426" fill="none" stroke="#B8A88A" stroke-opacity="0.65" stroke-width="2.2"/>
+  <path d="M248 442 Q302 512 356 442" fill="none" stroke="#B8A88A" stroke-opacity="0.4" stroke-width="1.4"/>
+  <path d="M262 460 Q302 530 342 460" fill="none" stroke="#B8A88A" stroke-opacity="0.25" stroke-width="1"/>
+  <rect width="600" height="800" fill="url(#bFade)"/>
+</svg>

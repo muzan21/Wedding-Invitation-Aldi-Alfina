@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800" width="600" height="800">
+  <defs>
+    <linearGradient id="mono" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#222222"/>
+      <stop offset="100%" stop-color="#0E0E0E"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="800" fill="url(#mono)"/>
+  <!-- Modern Monochrome Studio Full-Length Couple -->
+  <ellipse cx="246" cy="316" rx="28" ry="34" fill="#181818" stroke="#555"/>
+  <path d="M196 490 L214 366 C230 350, 266 350, 282 368 L294 490 Z" fill="#DCDCDC" opacity="0.9"/>
+  <path d="M208 490 L282 490 L272 706 L220 706 Z" fill="#0B0B0B"/>
+  <ellipse cx="348" cy="284" rx="30" ry="36" fill="#1A1A1A" stroke="#555"/>
+  <path d="M294 510 L306 336 C324 316, 376 316, 394 338 L404 510 Z" fill="#0E0E0E" stroke="#383838"/>
+  <rect x="330" y="338" width="36" height="145" fill="#E6E6E6" opacity="0.9"/>
+  <path d="M306 510 L392 510 L382 708 L316 708 Z" fill="#090909"/>
+  <line x1="120" y1="712" x2="480" y2="712" stroke="#303030" stroke-width="1"/>
+</svg>

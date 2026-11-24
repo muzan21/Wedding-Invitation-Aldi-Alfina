@@ -1,0 +1,6 @@
+{
+  "name": "Simanten Black Edition — Digital Wedding Invitation",
+  "description": "Luxury Black Edition Javanese digital wedding invitation with personalized guest links, QR check-in, live countdown, RSVP, wishes wall, and complete admin dashboard.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,308 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global Safety Net: Default-deny all paths unless explicitly matched
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- Global Hardened Primitives ---
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerifiedUser() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isOwnerEmail() {
+      return isVerifiedUser() &&
+        request.auth.token.email is string &&
+        request.auth.token.email.lower() == 'saeful.muzani@gmail.com';
+    }
+
+    function isAdmin() {
+      return isOwnerEmail() || (
+        isVerifiedUser() &&
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    function isStr(val, minLen, maxLen) {
+      return val is string && val.size() >= minLen && val.size() <= maxLen;
+    }
+
+    function isOptStr(data, key, maxLen) {
+      return !(key in data) || (data[key] is string && data[key].size() <= maxLen);
+    }
+
+    function isValidVisibility(v) {
+      return v is map &&
+        v.keys().hasOnly([
+          'cover', 'hero', 'verse', 'couple', 'events', 'countdown',
+          'gift', 'filter', 'gallery', 'wishes', 'rsvp', 'closing', 'qrCode'
+        ]) &&
+        (!('cover' in v) || v.cover is bool) &&
+        (!('hero' in v) || v.hero is bool) &&
+        (!('verse' in v) || v.verse is bool) &&
+        (!('couple' in v) || v.couple is bool) &&
+        (!('events' in v) || v.events is bool) &&
+        (!('countdown' in v) || v.countdown is bool) &&
+        (!('gift' in v) || v.gift is bool) &&
+        (!('filter' in v) || v.filter is bool) &&
+        (!('gallery' in v) || v.gallery is bool) &&
+        (!('wishes' in v) || v.wishes is bool) &&
+        (!('rsvp' in v) || v.rsvp is bool) &&
+        (!('closing' in v) || v.closing is bool) &&
+        (!('qrCode' in v) || v.qrCode is bool);
+    }
+
+    // --- Validation Blueprints ---
+    function isValidWeddingConfig(data) {
+      return data.keys().hasAll(['groomShortName', 'brideShortName', 'weddingDateIso', 'updatedAt']) &&
+        data.keys().hasOnly([
+          'groomShortName', 'groomFullName', 'groomChildOrder', 'groomFather', 'groomMother', 'groomInstagram',
+          'brideShortName', 'brideFullName', 'brideChildOrder', 'brideFather', 'brideMother', 'brideInstagram',
+          'monogramLeft', 'monogramRight', 'weddingDateIso', 'heroDateDisplay', 'weddingTitle', 'weddingDescription',
+          'countdownTitle', 'verseArabic', 'verseTranslation', 'verseSurah',
+          'openingGreetingBismillah', 'openingGreetingSalam', 'openingGreetingBody',
+          'closingMessage', 'closingSalam', 'closingFamilyHeader', 'footerBrand', 'footerContact',
+          'giftDescription', 'giftShippingAddress', 'giftShippingRecipient',
+          'filterTitle', 'filterDescription', 'filterInstagramUrl',
+          'desktopSplitPhoto', 'heroPhoto', 'groomPhoto', 'bridePhoto',
+          'eventBackdropPhoto', 'wishesBackdropPhoto', 'closingBackdropPhoto', 'footerCouplePhoto',
+          'musicEnabled', 'musicAutoplayOnOpen', 'musicUrl', 'musicTitle',
+          'visibility', 'updatedAt'
+        ]) &&
+        isStr(data.groomShortName, 1, 80) &&
+        isStr(data.brideShortName, 1, 80) &&
+        isStr(data.weddingDateIso, 4, 64) &&
+        isOptStr(data, 'groomFullName', 140) &&
+        isOptStr(data, 'groomChildOrder', 80) &&
+        isOptStr(data, 'groomFather', 140) &&
+        isOptStr(data, 'groomMother', 140) &&
+        isOptStr(data, 'groomInstagram', 200) &&
+        isOptStr(data, 'brideFullName', 140) &&
+        isOptStr(data, 'brideChildOrder', 80) &&
+        isOptStr(data, 'brideFather', 140) &&
+        isOptStr(data, 'brideMother', 140) &&
+        isOptStr(data, 'brideInstagram', 200) &&
+        isOptStr(data, 'monogramLeft', 4) &&
+        isOptStr(data, 'monogramRight', 4) &&
+        isOptStr(data, 'heroDateDisplay', 40) &&
+        isOptStr(data, 'weddingTitle', 140) &&
+        isOptStr(data, 'weddingDescription', 600) &&
+        isOptStr(data, 'countdownTitle', 120) &&
+        isOptStr(data, 'verseArabic', 1200) &&
+        isOptStr(data, 'verseTranslation', 1200) &&
+        isOptStr(data, 'verseSurah', 100) &&
+        isOptStr(data, 'openingGreetingBismillah', 140) &&
+        isOptStr(data, 'openingGreetingSalam', 180) &&
+        isOptStr(data, 'openingGreetingBody', 600) &&
+        isOptStr(data, 'closingMessage', 800) &&
+        isOptStr(data, 'closingSalam', 180) &&
+        isOptStr(data, 'closingFamilyHeader', 160) &&
+        isOptStr(data, 'footerBrand', 100) &&
+        isOptStr(data, 'footerContact', 80) &&
+        isOptStr(data, 'giftDescription', 800) &&
+        isOptStr(data, 'giftShippingAddress', 400) &&
+        isOptStr(data, 'giftShippingRecipient', 140) &&
+        isOptStr(data, 'filterTitle', 100) &&
+        isOptStr(data, 'filterDescription', 500) &&
+        isOptStr(data, 'filterInstagramUrl', 400) &&
+        isOptStr(data, 'desktopSplitPhoto', 500) &&
+        isOptStr(data, 'heroPhoto', 500) &&
+        isOptStr(data, 'groomPhoto', 500) &&
+        isOptStr(data, 'bridePhoto', 500) &&
+        isOptStr(data, 'eventBackdropPhoto', 500) &&
+        isOptStr(data, 'wishesBackdropPhoto', 500) &&
+        isOptStr(data, 'closingBackdropPhoto', 500) &&
+        isOptStr(data, 'footerCouplePhoto', 500) &&
+        (!('musicEnabled' in data) || data.musicEnabled is bool) &&
+        (!('musicAutoplayOnOpen' in data) || data.musicAutoplayOnOpen is bool) &&
+        isOptStr(data, 'musicUrl', 500) &&
+        isOptStr(data, 'musicTitle', 140) &&
+        (!('visibility' in data) || isValidVisibility(data.visibility)) &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidEvent(data) {
+      return data.keys().hasAll(['title', 'dateLabel', 'startTime', 'endTime', 'venueName', 'address', 'sortOrder', 'createdAt']) &&
+        data.keys().hasOnly([
+          'title', 'dateLabel', 'isoDateTime', 'startTime', 'endTime', 'timezone',
+          'venueSubtitle', 'venueName', 'address', 'mapsUrl', 'description',
+          'sortOrder', 'createdAt', 'updatedAt'
+        ]) &&
+        isStr(data.title, 1, 100) &&
+        isStr(data.dateLabel, 1, 100) &&
+        isOptStr(data, 'isoDateTime', 64) &&
+        isStr(data.startTime, 1, 32) &&
+        isStr(data.endTime, 1, 32) &&
+        isOptStr(data, 'timezone', 16) &&
+        isOptStr(data, 'venueSubtitle', 140) &&
+        isStr(data.venueName, 1, 180) &&
+        isStr(data.address, 1, 400) &&
+        isOptStr(data, 'mapsUrl', 500) &&
+        isOptStr(data, 'description', 500) &&
+        data.sortOrder is number && data.sortOrder >= 0 && data.sortOrder <= 1000 &&
+        data.createdAt is timestamp &&
+        (!('updatedAt' in data) || data.updatedAt is timestamp);
+    }
+
+    function isValidGift(data) {
+      return data.keys().hasAll(['type', 'providerName', 'accountNumber', 'accountHolder', 'sortOrder', 'createdAt']) &&
+        data.keys().hasOnly(['type', 'providerName', 'accountNumber', 'accountHolder', 'description', 'sortOrder', 'createdAt']) &&
+        (data.type == 'bank' || data.type == 'ewallet') &&
+        isStr(data.providerName, 1, 100) &&
+        isStr(data.accountNumber, 1, 60) &&
+        isStr(data.accountHolder, 1, 140) &&
+        isOptStr(data, 'description', 300) &&
+        data.sortOrder is number && data.sortOrder >= 0 && data.sortOrder <= 1000 &&
+        data.createdAt is timestamp;
+    }
+
+    function isValidGalleryPhoto(data) {
+      return data.keys().hasAll(['url', 'aspect', 'monochrome', 'sortOrder', 'createdAt']) &&
+        data.keys().hasOnly(['url', 'caption', 'aspect', 'monochrome', 'sortOrder', 'createdAt']) &&
+        isStr(data.url, 1, 500) &&
+        isOptStr(data, 'caption', 200) &&
+        (data.aspect == 'portrait' || data.aspect == 'landscape') &&
+        data.monochrome is bool &&
+        data.sortOrder is number && data.sortOrder >= 0 && data.sortOrder <= 1000 &&
+        data.createdAt is timestamp;
+    }
+
+    function isValidRsvp(data) {
+      return data.keys().hasAll(['guestName', 'attendance', 'attendeeCount', 'createdAt']) &&
+        data.keys().hasOnly(['guestName', 'attendance', 'attendeeCount', 'message', 'guestSlug', 'createdAt']) &&
+        isStr(data.guestName, 1, 120) &&
+        (data.attendance == 'Hadir' || data.attendance == 'Tidak Hadir') &&
+        data.attendeeCount is int && data.attendeeCount >= 0 && data.attendeeCount <= 10 &&
+        isOptStr(data, 'message', 600) &&
+        isOptStr(data, 'guestSlug', 120) &&
+        data.createdAt is timestamp;
+    }
+
+    function isValidWish(data) {
+      return data.keys().hasAll(['guestName', 'attendance', 'message', 'status', 'createdAt']) &&
+        data.keys().hasOnly(['guestName', 'attendance', 'message', 'status', 'createdAt']) &&
+        isStr(data.guestName, 1, 120) &&
+        (data.attendance == 'Hadir' || data.attendance == 'Tidak Hadir') &&
+        isStr(data.message, 1, 600) &&
+        (data.status == 'approved' || data.status == 'pending' || data.status == 'rejected') &&
+        data.createdAt is timestamp;
+    }
+
+    function isValidGuest(data) {
+      return data.keys().hasAll(['name', 'slug', 'maxGuests', 'qrToken', 'checkedIn', 'createdAt']) &&
+        data.keys().hasOnly(['name', 'slug', 'group', 'phone', 'maxGuests', 'qrToken', 'checkedIn', 'createdAt']) &&
+        isStr(data.name, 1, 120) &&
+        isStr(data.slug, 1, 140) &&
+        isOptStr(data, 'group', 80) &&
+        isOptStr(data, 'phone', 40) &&
+        data.maxGuests is int && data.maxGuests >= 1 && data.maxGuests <= 20 &&
+        isStr(data.qrToken, 6, 100) &&
+        data.checkedIn is bool &&
+        data.createdAt is timestamp;
+    }
+
+    function isValidAdmin(data) {
+      return data.keys().hasAll(['email', 'role', 'createdAt']) &&
+        data.keys().hasOnly(['email', 'displayName', 'role', 'createdAt']) &&
+        isStr(data.email, 3, 180) &&
+        isOptStr(data, 'displayName', 120) &&
+        data.role == 'admin' &&
+        data.createdAt is timestamp;
+    }
+
+    // --- Collection Rules ---
+
+    // 1. Wedding Config (public read for invitation; verified admin write)
+    match /wedding/{docId} {
+      allow get: if isValidId(docId);
+      allow list: if false;
+      allow create: if isValidId(docId) && isValidWeddingConfig(incoming()) && incoming().updatedAt == request.time && isAdmin();
+      allow update: if isValidId(docId) && isValidWeddingConfig(incoming()) && incoming().updatedAt == request.time && isAdmin();
+      allow delete: if false;
+    }
+
+    // 2. Wedding Events (public read; verified admin write)
+    match /events/{eventId} {
+      allow get: if isValidId(eventId);
+      allow list: if resource.data.sortOrder >= 0;
+      allow create: if isValidId(eventId) && isValidEvent(incoming()) && incoming().createdAt == request.time && isAdmin();
+      allow update: if isValidId(eventId) && isValidEvent(incoming()) && incoming().createdAt == existing().createdAt && isAdmin();
+      allow delete: if isValidId(eventId) && isAdmin();
+    }
+
+    // 3. Digital Gifts (public read; verified admin write)
+    match /gifts/{giftId} {
+      allow get: if isValidId(giftId);
+      allow list: if resource.data.sortOrder >= 0;
+      allow create: if isValidId(giftId) && isValidGift(incoming()) && incoming().createdAt == request.time && isAdmin();
+      allow update: if isValidId(giftId) && isValidGift(incoming()) && incoming().createdAt == existing().createdAt && isAdmin();
+      allow delete: if isValidId(giftId) && isAdmin();
+    }
+
+    // 4. Gallery Photos (public read; verified admin write)
+    match /gallery/{photoId} {
+      allow get: if isValidId(photoId);
+      allow list: if resource.data.sortOrder >= 0;
+      allow create: if isValidId(photoId) && isValidGalleryPhoto(incoming()) && incoming().createdAt == request.time && isAdmin();
+      allow update: if isValidId(photoId) && isValidGalleryPhoto(incoming()) && incoming().createdAt == existing().createdAt && isAdmin();
+      allow delete: if isValidId(photoId) && isAdmin();
+    }
+
+    // 5. RSVP Submissions (public create with strict validation; admin-only read/update/delete)
+    match /rsvps/{rsvpId} {
+      allow get: if isValidId(rsvpId) && isAdmin();
+      allow list: if isAdmin();
+      allow create: if isValidId(rsvpId) && isValidRsvp(incoming()) && incoming().createdAt == request.time;
+      allow update: if isValidId(rsvpId) && isValidRsvp(incoming()) && incoming().createdAt == existing().createdAt && isAdmin();
+      allow delete: if isValidId(rsvpId) && isAdmin();
+    }
+
+    // 6. Guest Wishes (public create as 'approved'; public list ONLY approved; admin full moderation)
+    match /wishes/{wishId} {
+      allow get: if isValidId(wishId) && (existing().status == 'approved' || isAdmin());
+      allow list: if resource.data.status == 'approved' || isAdmin();
+      allow create: if isValidId(wishId) && isValidWish(incoming()) && incoming().status == 'approved' && incoming().createdAt == request.time;
+      allow update: if isValidId(wishId) && isValidWish(incoming()) &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().diff(existing()).affectedKeys().hasOnly(['status', 'message']) &&
+        isAdmin();
+      allow delete: if isValidId(wishId) && isAdmin();
+    }
+
+    // 7. Private Guest List & QR Registry (strictly admin-only PII isolation)
+    match /guests/{guestId} {
+      allow get: if isValidId(guestId) && isAdmin();
+      allow list: if isAdmin();
+      allow create: if isValidId(guestId) && isValidGuest(incoming()) && incoming().createdAt == request.time && isAdmin();
+      allow update: if isValidId(guestId) && isValidGuest(incoming()) && incoming().createdAt == existing().createdAt && isAdmin();
+      allow delete: if isValidId(guestId) && isAdmin();
+    }
+
+    // 8. Admin Registry (owner/admin-only, never self-assigned)
+    match /admins/{uid} {
+      allow get: if isValidId(uid) && isAdmin();
+      allow list: if isAdmin();
+      allow create: if isValidId(uid) && isValidAdmin(incoming()) && incoming().createdAt == request.time && isOwnerEmail();
+      allow update: if isValidId(uid) && isValidAdmin(incoming()) && incoming().createdAt == existing().createdAt && isOwnerEmail();
+      allow delete: if isValidId(uid) && isOwnerEmail();
+    }
+  }
+}

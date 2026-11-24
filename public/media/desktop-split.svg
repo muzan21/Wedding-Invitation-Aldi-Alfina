@@ -1,0 +1,126 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1500" width="1200" height="1500">
+  <defs>
+    <radialGradient id="studioBg" cx="44%" cy="32%" r="72%">
+      <stop offset="0%" stop-color="#221F1B"/>
+      <stop offset="46%" stop-color="#11100E"/>
+      <stop offset="100%" stop-color="#050505"/>
+    </radialGradient>
+    <radialGradient id="rimGlow" cx="50%" cy="36%" r="48%">
+      <stop offset="0%" stop-color="#B8A88A" stop-opacity="0.18"/>
+      <stop offset="65%" stop-color="#B8A88A" stop-opacity="0.03"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="drapeL" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#090908"/>
+      <stop offset="48%" stop-color="#1E1B17"/>
+      <stop offset="100%" stop-color="#0B0A09"/>
+    </linearGradient>
+    <linearGradient id="drapeC" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#141311"/>
+      <stop offset="50%" stop-color="#292520"/>
+      <stop offset="100%" stop-color="#11100E"/>
+    </linearGradient>
+    <linearGradient id="drapeR" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#0E0D0C"/>
+      <stop offset="55%" stop-color="#1C1814"/>
+      <stop offset="100%" stop-color="#070707"/>
+    </linearGradient>
+    <linearGradient id="silkSheen" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2A2620"/>
+      <stop offset="45%" stop-color="#131210"/>
+      <stop offset="100%" stop-color="#060606"/>
+    </linearGradient>
+    <linearGradient id="velvetFade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#080808" stop-opacity="0"/>
+      <stop offset="72%" stop-color="#080808" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#060606" stop-opacity="0.96"/>
+    </linearGradient>
+    <pattern id="parangBatik" width="52" height="52" patternUnits="userSpaceOnUse" patternTransform="rotate(-24)">
+      <path d="M0 26 Q13 10 26 26 T52 26" fill="none" stroke="#B8A88A" stroke-opacity="0.2" stroke-width="1.2"/>
+      <path d="M0 40 Q13 24 26 40 T52 40" fill="none" stroke="#B8A88A" stroke-opacity="0.11" stroke-width="0.9"/>
+      <circle cx="26" cy="26" r="2.2" fill="#B8A88A" fill-opacity="0.16"/>
+    </pattern>
+    <filter id="softBlur">
+      <feGaussianBlur stdDeviation="24"/>
+    </filter>
+  </defs>
+
+  <!-- Deep editorial charcoal studio backdrop -->
+  <rect width="1200" height="1500" fill="url(#studioBg)"/>
+  <ellipse cx="540" cy="520" rx="460" ry="440" fill="url(#rimGlow)" filter="url(#softBlur)"/>
+
+  <!-- Fine-art architectural wooden studio frame echoing Simanten composition -->
+  <g opacity="0.72">
+    <rect x="132" y="168" width="690" height="1220" fill="none" stroke="#B8A88A" stroke-opacity="0.26" stroke-width="14"/>
+    <rect x="148" y="184" width="658" height="1188" fill="none" stroke="#B8A88A" stroke-opacity="0.1" stroke-width="1.5"/>
+  </g>
+
+  <!-- Sculpted vertical studio velvet drapery (charcoal, obsidian, muted taupe-black) -->
+  <path d="M350 156 C380 460 330 880 356 1460 L512 1460 C496 920 536 470 508 156 Z" fill="url(#drapeL)" opacity="0.95"/>
+  <path d="M492 156 C524 480 486 900 504 1460 L664 1460 C652 880 688 460 656 156 Z" fill="url(#drapeC)" opacity="0.92"/>
+  <path d="M642 156 C694 490 676 920 718 1460 L924 1460 C876 920 842 470 796 156 Z" fill="url(#drapeR)" opacity="0.95"/>
+
+  <!-- Subtle diagonal chiaroscuro light shaft across drapery -->
+  <polygon points="0,0 440,0 920,1500 320,1500" fill="#B8A88A" opacity="0.032"/>
+
+  <!-- Sculpted Javanese Ornamental Fine-Art Architectural Crest behind couple -->
+  <g transform="translate(510, 690)" opacity="0.16" fill="none" stroke="#B8A88A">
+    <path d="M0 -340 C160 -210 210 40 160 310 L-160 310 C-210 40 -160 -210 0 -340 Z" stroke-width="1.4"/>
+    <path d="M0 -290 C128 -178 168 32 128 270 L-128 270 C-168 32 -128 -178 0 -290 Z" stroke-width="0.9" stroke-dasharray="5 6"/>
+  </g>
+
+  <!-- Editorial Fine-Art Chiaroscuro Couple Silhouette (Painterly Javanese Attire) -->
+  <g>
+    <!-- Bride (Left) — graceful sculpted profile with sanggul & filigree cunduk mentul -->
+    <g>
+      <!-- Sanggul bun + soft bridal head contour -->
+      <ellipse cx="268" cy="544" rx="46" ry="52" fill="#0D0C0B" stroke="#B8A88A" stroke-opacity="0.32" stroke-width="1.2"/>
+      <path d="M294 474 C338 456 386 476 398 524 C406 558 396 602 374 624 C354 644 316 642 296 616 C276 590 270 510 294 474 Z" fill="#12110F" stroke="#B8A88A" stroke-opacity="0.38" stroke-width="1.3"/>
+      <!-- Graceful hairline & brow rim light -->
+      <path d="M358 474 C382 486 396 512 396 544 C396 574 384 602 368 618" fill="none" stroke="#B8A88A" stroke-opacity="0.52" stroke-width="1.4"/>
+      <!-- Delicate Cunduk Mentul filigree hair ornaments -->
+      <g stroke="#B8A88A" stroke-opacity="0.62" fill="none">
+        <path d="M312 470 Q300 416 286 382" stroke-width="1.3"/>
+        <path d="M332 464 Q332 408 332 370" stroke-width="1.3"/>
+        <path d="M352 468 Q364 418 378 386" stroke-width="1.3"/>
+        <path d="M278 384 C284 374 294 374 294 384 C290 392 280 392 278 384 Z" fill="#B8A88A" fill-opacity="0.35"/>
+        <path d="M324 370 C330 358 340 358 340 370 C336 378 326 378 324 370 Z" fill="#B8A88A" fill-opacity="0.45"/>
+        <path d="M370 386 C376 376 386 376 386 386 C382 394 372 394 370 386 Z" fill="#B8A88A" fill-opacity="0.35"/>
+      </g>
+      <!-- Sculpted neck, shoulders & Javanese kemben / kebaya silhouette -->
+      <path d="M312 628 C306 668 290 692 246 724 C194 762 174 844 176 960 L164 1460 L468 1460 L452 940 C446 822 418 746 378 708 C362 692 356 664 358 634 Z" fill="url(#silkSheen)"/>
+      <!-- Woven Batik Parang bodice & drape -->
+      <path d="M224 764 C282 786 356 784 416 756 C440 834 452 930 462 1460 L176 1460 L188 948 C192 856 204 804 224 764 Z" fill="url(#parangBatik)"/>
+      <!-- Subtle gold-champagne kalung sungsang necklace contour -->
+      <path d="M294 676 Q336 732 378 686" fill="none" stroke="#B8A88A" stroke-opacity="0.58" stroke-width="2"/>
+      <path d="M302 688 Q336 748 372 698" fill="none" stroke="#B8A88A" stroke-opacity="0.35" stroke-width="1.3"/>
+      <!-- Waist sash highlight -->
+      <path d="M196 1018 Q320 1044 438 1006" fill="none" stroke="#B8A88A" stroke-opacity="0.48" stroke-width="6"/>
+      <path d="M198 1024 Q320 1050 438 1012" fill="none" stroke="#B8A88A" stroke-opacity="0.22" stroke-width="1.5"/>
+    </g>
+
+    <!-- Groom (Right) — sculpted Javanese blangkon & tailored black beskap -->
+    <g>
+      <!-- Head + Blangkon contour -->
+      <path d="M466 444 C462 384 510 344 568 348 C624 352 658 394 654 458 C650 518 620 568 570 572 C516 576 472 528 466 444 Z" fill="#131210" stroke="#B8A88A" stroke-opacity="0.4" stroke-width="1.3"/>
+      <!-- Blangkon traditional fold & trim -->
+      <path d="M464 432 C474 370 518 338 574 342 C628 346 658 380 658 426 C620 402 512 400 464 432 Z" fill="#1E1A15" stroke="#B8A88A" stroke-opacity="0.58" stroke-width="1.5"/>
+      <path d="M472 418 C522 394 612 394 652 414" fill="none" stroke="#B8A88A" stroke-opacity="0.32" stroke-width="1" stroke-dasharray="4 3"/>
+      <!-- Tailored Beskap jacket with sculpted lapel & shoulder rim light -->
+      <path d="M518 566 L618 566 C630 604 662 628 712 652 C774 682 806 762 812 894 L832 1460 L398 1460 L414 888 C420 756 444 674 494 644 C512 632 518 600 518 566 Z" fill="url(#silkSheen)"/>
+      <path d="M494 644 C446 676 420 756 414 888 M712 652 C772 682 806 762 812 894" fill="none" stroke="#B8A88A" stroke-opacity="0.34" stroke-width="1.4"/>
+      <!-- Beskap mandarin collar & delicate brooch -->
+      <path d="M516 588 L566 632 L616 588" fill="none" stroke="#B8A88A" stroke-opacity="0.45" stroke-width="1.5"/>
+      <g transform="translate(514, 738)">
+        <circle cx="0" cy="0" r="14" fill="#1C1914" stroke="#B8A88A" stroke-opacity="0.65" stroke-width="1.2"/>
+        <circle cx="0" cy="0" r="6" fill="#B8A88A" fill-opacity="0.55"/>
+      </g>
+      <!-- Woven Jarik Batik wrap below waist -->
+      <path d="M412 1086 L816 1086 L830 1460 L398 1460 Z" fill="url(#parangBatik)"/>
+      <path d="M412 1086 Q614 1106 816 1086" fill="none" stroke="#B8A88A" stroke-opacity="0.38" stroke-width="2"/>
+    </g>
+  </g>
+
+  <!-- Soft bottom shadow vignette for crisp white editorial overlay caption -->
+  <rect width="1200" height="1500" fill="url(#velvetFade)"/>
+</svg>

@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1200" width="900" height="1200">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#141311"/>
+      <stop offset="65%" stop-color="#1B1815"/>
+      <stop offset="100%" stop-color="#050505"/>
+    </linearGradient>
+    <radialGradient id="halo" cx="50%" cy="42%" r="55%">
+      <stop offset="0%" stop-color="#362F26" stop-opacity="0.62"/>
+      <stop offset="100%" stop-color="#080808" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#E2D2AF"/>
+      <stop offset="100%" stop-color="#75654B"/>
+    </linearGradient>
+    <pattern id="batik" width="38" height="38" patternUnits="userSpaceOnUse">
+      <path d="M19 3 L35 19 L19 35 L3 19 Z" fill="none" stroke="#B8A88A" stroke-width="0.8" opacity="0.32"/>
+    </pattern>
+  </defs>
+  <rect width="900" height="1200" fill="url(#bg)"/>
+  <rect width="900" height="1200" fill="url(#halo)"/>
+  <rect x="190" y="130" width="520" height="1070" fill="none" stroke="#3D362D" stroke-width="9" opacity="0.72"/>
+  <path d="M350 130 Q375 620 330 1200 L480 1200 Q490 620 470 130 Z" fill="#1F1C18" opacity="0.85"/>
+  <path d="M470 130 Q530 620 690 1200 L790 1200 Q650 620 600 130 Z" fill="#2A241E" opacity="0.8"/>
+  <!-- Groom Left + Bride Right standing arm-in-arm (mirroring Simanten footer portrait) -->
+  <ellipse cx="372" cy="402" rx="48" ry="60" fill="#1C1916" stroke="#5A4F40" stroke-width="1.3"/>
+  <path d="M322 388 C328 334, 416 334, 422 388 C396 372, 348 372, 322 388 Z" fill="#25201A" stroke="url(#gold)" stroke-width="1.8"/>
+  <path d="M242 1200 L264 532 C292 480, 444 480, 472 532 L494 1200 Z" fill="#131210" stroke="#524739" stroke-width="1.5"/>
+  <circle cx="424" cy="584" r="12" fill="none" stroke="url(#gold)" stroke-width="2" opacity="0.85"/>
+  <ellipse cx="554" cy="434" rx="44" ry="56" fill="#1D1A17" stroke="#5A4F40" stroke-width="1.3"/>
+  <g stroke="url(#gold)" stroke-width="1.5" fill="none" opacity="0.88">
+    <path d="M530 382 L522 332"/><circle cx="521" cy="328" r="8" fill="#B8A88A" fill-opacity="0.35"/>
+    <path d="M554 376 L554 322"/><circle cx="554" cy="318" r="9" fill="#B8A88A" fill-opacity="0.4"/>
+    <path d="M578 382 L586 332"/><circle cx="587" cy="328" r="8" fill="#B8A88A" fill-opacity="0.35"/>
+  </g>
+  <path d="M458 1200 L476 566 C504 522, 608 522, 636 568 L660 1200 Z" fill="#141311" stroke="#524739" stroke-width="1.4"/>
+  <path d="M466 644 L642 644 L660 1200 L458 1200 Z" fill="url(#batik)"/>
+  <path d="M510 538 Q554 584 598 538" fill="none" stroke="url(#gold)" stroke-width="3.2" opacity="0.8"/>
+  <!-- Deep bottom dark vignette for footer text legibility -->
+  <linearGradient id="vig" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#050505" stop-opacity="0"/>
+    <stop offset="100%" stop-color="#050505" stop-opacity="0.96"/>
+  </linearGradient>
+  <rect x="0" y="780" width="900" height="420" fill="url(#vig)"/>
+</svg>

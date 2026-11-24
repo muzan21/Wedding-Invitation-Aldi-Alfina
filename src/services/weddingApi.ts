@@ -1,0 +1,432 @@
+import {
+  collection,
+  doc,
+  serverTimestamp,
+  setDoc,
+} from 'firebase/firestore';
+import { auth, db, handleFirestoreError, OperationType } from '../lib/firebase';
+import type {
+  AdminBundle,
+  DigitalGift,
+  GalleryPhoto,
+  GuestRecord,
+  GuestWish,
+  InvitationBundle,
+  RsvpSubmission,
+  WeddingConfig,
+  WeddingEvent,
+  WishStatus,
+} from '../types/wedding';
+import { slugifyGuestName } from '../utils/weddingLogic';
+
+// Session token held strictly in memory (never localStorage or sessionStorage)
+let adminBearerToken: string | null = null;
+
+export function setAdminToken(token: string | null): void {
+  adminBearerToken = token;
+}
+
+export function getAdminToken(): string | null {
+  return adminBearerToken;
+}
+
+function authHeaders(): HeadersInit {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+  if (adminBearerToken) {
+    headers.Authorization = `Bearer ${adminBearerToken}`;
+  }
+  return headers;
+}
+
+async function parseJsonOrThrow<T>(res: Response): Promise<T> {
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    const msg = (data as { error?: string }).error || `Request failed (${res.status})`;
+    throw new Error(msg);
+  }
+  return data as T;
+}
+
+// --- Public APIs ---
+export async function fetchPublicInvitation(): Promise<InvitationBundle> {
+  const res = await fetch('/api/public/invitation');
+  return parseJsonOrThrow<InvitationBundle>(res);
+}
+
+export async function lookupPublicGuest(name: string): Promise<{
+  found: boolean;
+  name?: string;
+  qrToken?: string;
+  maxGuests?: number;
+  group?: string;
+}> {
+  const res = await fetch(`/api/public/guest-lookup?name=${encodeURIComponent(name)}`);
+  return parseJsonOrThrow(res);
+}
+
+export async function submitPublicRsvp(payload: {
+  guestName: string;
+  attendance: 'Hadir' | 'Tidak Hadir';
+  attendeeCount: number;
+  message: string;
+}): Promise<{ rsvp: RsvpSubmission; wish: GuestWish | null }> {
+  const res = await fetch('/api/public/rsvp', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  const result = await parseJsonOrThrow<{ rsvp: RsvpSubmission; wish: GuestWish | null }>(res);
+
+  // Best-effort mirror to Firestore using validated public-create rules
+  try {
+    const rsvpRef = doc(collection(db, 'rsvps'), result.rsvp.id);
+    await setDoc(rsvpRef, {
+      guestName: result.rsvp.guestName,
+      attendance: result.rsvp.attendance,
+      attendeeCount: result.rsvp.attendeeCount,
+      message: result.rsvp.message,
+      guestSlug: slugifyGuestName(result.rsvp.guestName),
+      createdAt: serverTimestamp(),
+    });
+    if (result.wish) {
+      const wishRef = doc(collection(db, 'wishes'), result.wish.id);
+      await setDoc(wishRef, {
+        guestName: result.wish.guestName,
+        attendance: result.wish.attendance,
+        message: result.wish.message,
+        status: 'approved',
+        createdAt: serverTimestamp(),
+      });
+    }
+  } catch (err) {
+    // Log structured Firestore error without blocking guest confirmation
+    try {
+      handleFirestoreError(err, OperationType.CREATE, 'rsvps');
+    } catch {
+      // Handled gracefully since primary Express store succeeded
+    }
+  }
+
+  return result;
+}
+
+// --- Admin Auth APIs ---
+export interface AdminAuthStatus {
+  needsSetup: boolean;
+  usesEnvOverride: boolean;
+  authenticated: boolean;
+  username?: string;
+}
+
+export async function fetchAdminAuthStatus(): Promise<AdminAuthStatus> {
+  const headers: Record<string, string> = {};
+  if (adminBearerToken) {
+    headers.Authorization = `Bearer ${adminBearerToken}`;
+  }
+  const res = await fetch('/api/admin/auth/status', { headers });
+  return parseJsonOrThrow<AdminAuthStatus>(res);
+}
+
+export async function setupAdminAccount(
+  username: string,
+  password: string
+): Promise<{ token: string; username: string }> {
+  const res = await fetch('/api/admin/auth/setup', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username, password }),
+  });
+  const data = await parseJsonOrThrow<{ token: string; username: string }>(res);
+  setAdminToken(data.token);
+  return data;
+}
+
+export async function loginAdminAccount(
+  username: string,
+  password: string
+): Promise<{ token: string; username: string }> {
+  const res = await fetch('/api/admin/auth/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username, password }),
+  });
+  const data = await parseJsonOrThrow<{ token: string; username: string }>(res);
+  setAdminToken(data.token);
+  return data;
+}
+
+export async function logoutAdminAccount(): Promise<void> {
+  if (adminBearerToken) {
+    await fetch('/api/admin/auth/logout', {
+      method: 'POST',
+      headers: authHeaders(),
+    }).catch(() => {});
+  }
+  setAdminToken(null);
+}
+
+export async function changeAdminPassword(
+  currentPassword: string,
+  newPassword: string
+): Promise<{ ok: boolean }> {
+  const res = await fetch('/api/admin/auth/change-password', {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify({ currentPassword, newPassword }),
+  });
+  return parseJsonOrThrow<{ ok: boolean }>(res);
+}
+
+// --- Protected Admin Data APIs ---
+export async function fetchAdminBundle(): Promise<AdminBundle> {
+  const res = await fetch('/api/admin/bundle', { headers: authHeaders() });
+  return parseJsonOrThrow<AdminBundle>(res);
+}
+
+export async function updateWeddingConfig(config: WeddingConfig): Promise<WeddingConfig> {
+  const res = await fetch('/api/admin/config', {
+    method: 'PUT',
+    headers: authHeaders(),
+    body: JSON.stringify(config),
+  });
+  const saved = await parseJsonOrThrow<WeddingConfig>(res);
+
+  // Sync to Firestore if Firebase admin user is also signed in
+  if (auth.currentUser?.emailVerified) {
+    try {
+      await setDoc(doc(db, 'wedding', 'main'), {
+        ...saved,
+        updatedAt: serverTimestamp(),
+      });
+    } catch (err) {
+      try {
+        handleFirestoreError(err, OperationType.WRITE, 'wedding/main');
+      } catch {
+        // Primary backend persisted
+      }
+    }
+  }
+  return saved;
+}
+
+export async function createWeddingEvent(event: Omit<WeddingEvent, 'id' | 'createdAt'>): Promise<WeddingEvent> {
+  const res = await fetch('/api/admin/events', {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify(event),
+  });
+  return parseJsonOrThrow<WeddingEvent>(res);
+}
+
+export async function updateWeddingEvent(id: string, event: Partial<WeddingEvent>): Promise<WeddingEvent> {
+  const res = await fetch(`/api/admin/events/${encodeURIComponent(id)}`, {
+    method: 'PUT',
+    headers: authHeaders(),
+    body: JSON.stringify(event),
+  });
+  return parseJsonOrThrow<WeddingEvent>(res);
+}
+
+export async function deleteWeddingEvent(id: string): Promise<void> {
+  const res = await fetch(`/api/admin/events/${encodeURIComponent(id)}`, {
+    method: 'DELETE',
+    headers: authHeaders(),
+  });
+  await parseJsonOrThrow(res);
+}
+
+export async function createDigitalGift(gift: Omit<DigitalGift, 'id' | 'createdAt' | 'sortOrder'>): Promise<DigitalGift> {
+  const res = await fetch('/api/admin/gifts', {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify(gift),
+  });
+  return parseJsonOrThrow<DigitalGift>(res);
+}
+
+export async function updateDigitalGift(id: string, gift: Partial<DigitalGift>): Promise<DigitalGift> {
+  const res = await fetch(`/api/admin/gifts/${encodeURIComponent(id)}`, {
+    method: 'PUT',
+    headers: authHeaders(),
+    body: JSON.stringify(gift),
+  });
+  return parseJsonOrThrow<DigitalGift>(res);
+}
+
+export async function deleteDigitalGift(id: string): Promise<void> {
+  const res = await fetch(`/api/admin/gifts/${encodeURIComponent(id)}`, {
+    method: 'DELETE',
+    headers: authHeaders(),
+  });
+  await parseJsonOrThrow(res);
+}
+
+export async function createGalleryPhoto(photo: Omit<GalleryPhoto, 'id' | 'createdAt' | 'sortOrder'>): Promise<GalleryPhoto> {
+  const res = await fetch('/api/admin/gallery', {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify(photo),
+  });
+  return parseJsonOrThrow<GalleryPhoto>(res);
+}
+
+export async function deleteGalleryPhoto(id: string): Promise<void> {
+  const res = await fetch(`/api/admin/gallery/${encodeURIComponent(id)}`, {
+    method: 'DELETE',
+    headers: authHeaders(),
+  });
+  await parseJsonOrThrow(res);
+}
+
+export async function deleteRsvpRecord(id: string): Promise<void> {
+  const res = await fetch(`/api/admin/rsvps/${encodeURIComponent(id)}`, {
+    method: 'DELETE',
+    headers: authHeaders(),
+  });
+  await parseJsonOrThrow(res);
+}
+
+export async function moderateWish(id: string, status: WishStatus): Promise<GuestWish> {
+  const res = await fetch(`/api/admin/wishes/${encodeURIComponent(id)}`, {
+    method: 'PATCH',
+    headers: authHeaders(),
+    body: JSON.stringify({ status }),
+  });
+  return parseJsonOrThrow<GuestWish>(res);
+}
+
+export async function deleteWishRecord(id: string): Promise<void> {
+  const res = await fetch(`/api/admin/wishes/${encodeURIComponent(id)}`, {
+    method: 'DELETE',
+    headers: authHeaders(),
+  });
+  await parseJsonOrThrow(res);
+}
+
+export async function createGuestRecord(guest: {
+  name: string;
+  group: string;
+  phone: string;
+  maxGuests: number;
+}): Promise<GuestRecord> {
+  const res = await fetch('/api/admin/guests', {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify(guest),
+  });
+  return parseJsonOrThrow<GuestRecord>(res);
+}
+
+export async function importGuestsFromCsv(csv: string): Promise<{ imported: number; guests: GuestRecord[] }> {
+  const res = await fetch('/api/admin/guests/import-csv', {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify({ csv }),
+  });
+  return parseJsonOrThrow<{ imported: number; guests: GuestRecord[] }>(res);
+}
+
+export async function updateGuestRecord(id: string, guest: Partial<GuestRecord>): Promise<GuestRecord> {
+  const res = await fetch(`/api/admin/guests/${encodeURIComponent(id)}`, {
+    method: 'PUT',
+    headers: authHeaders(),
+    body: JSON.stringify(guest),
+  });
+  return parseJsonOrThrow<GuestRecord>(res);
+}
+
+export async function deleteGuestRecord(id: string): Promise<void> {
+  const res = await fetch(`/api/admin/guests/${encodeURIComponent(id)}`, {
+    method: 'DELETE',
+    headers: authHeaders(),
+  });
+  await parseJsonOrThrow(res);
+}
+
+// Client-side image optimization (resize large uploads > 1600px cleanly before upload)
+export async function compressImageIfNeeded(file: File): Promise<File> {
+  if (!file.type.startsWith('image/') || file.size < 450 * 1024) {
+    return file;
+  }
+  return new Promise((resolve) => {
+    const img = new Image();
+    const objectUrl = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(objectUrl);
+      const maxDim = 1600;
+      let { width, height } = img;
+      if (width <= maxDim && height <= maxDim) {
+        resolve(file);
+        return;
+      }
+      if (width > height) {
+        height = Math.round((height * maxDim) / width);
+        width = maxDim;
+      } else {
+        width = Math.round((width * maxDim) / height);
+        height = maxDim;
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        resolve(file);
+        return;
+      }
+      ctx.drawImage(img, 0, 0, width, height);
+      const targetMime = file.type === 'image/png' ? 'image/png' : 'image/webp';
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) {
+            resolve(file);
+            return;
+          }
+          const ext = targetMime === 'image/png' ? '.png' : '.webp';
+          const baseName = file.name.replace(/\.[^.]+$/, '');
+          resolve(new File([blob], `${baseName}${ext}`, { type: targetMime }));
+        },
+        targetMime,
+        0.86
+      );
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      resolve(file);
+    };
+    img.src = objectUrl;
+  });
+}
+
+export async function uploadAdminImage(file: File): Promise<{ url: string; filename: string }> {
+  const optimized = await compressImageIfNeeded(file);
+  const form = new FormData();
+  form.append('file', optimized);
+  const headers: Record<string, string> = {};
+  if (adminBearerToken) {
+    headers.Authorization = `Bearer ${adminBearerToken}`;
+  }
+  const res = await fetch('/api/admin/upload/image', {
+    method: 'POST',
+    headers,
+    body: form,
+  });
+  return parseJsonOrThrow<{ url: string; filename: string }>(res);
+}
+
+export async function uploadAdminAudio(file: File): Promise<{ url: string; filename: string; originalName: string }> {
+  const form = new FormData();
+  form.append('file', file);
+  const headers: Record<string, string> = {};
+  if (adminBearerToken) {
+    headers.Authorization = `Bearer ${adminBearerToken}`;
+  }
+  const res = await fetch('/api/admin/upload/audio', {
+    method: 'POST',
+    headers,
+    body: form,
+  });
+  return parseJsonOrThrow<{ url: string; filename: string; originalName: string }>(res);
+}

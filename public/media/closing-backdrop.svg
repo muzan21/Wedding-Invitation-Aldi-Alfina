@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1200" width="900" height="1200">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0E0D0C"/>
+      <stop offset="55%" stop-color="#1C1915"/>
+      <stop offset="100%" stop-color="#090807"/>
+    </linearGradient>
+    <pattern id="batik" width="46" height="46" patternUnits="userSpaceOnUse">
+      <path d="M23 5 L41 23 L23 41 L5 23 Z" fill="none" stroke="#B8A88A" stroke-width="0.85" opacity="0.34"/>
+      <circle cx="23" cy="23" r="4" fill="#B8A88A" opacity="0.22"/>
+    </pattern>
+  </defs>
+  <rect width="900" height="1200" fill="url(#bg)"/>
+  <!-- Intimate close-up of Javanese beskap gold buttons & bride shoulder (echoing Simanten closing backdrop) -->
+  <path d="M0 160 C180 120, 380 150, 440 310 L460 1200 L0 1200 Z" fill="#141311" stroke="#453C31" stroke-width="2"/>
+  <circle cx="290" cy="420" r="18" fill="none" stroke="#B8A88A" stroke-width="2.5" opacity="0.65"/>
+  <circle cx="290" cy="420" r="6" fill="#B8A88A" opacity="0.65"/>
+  <circle cx="95" cy="300" r="10" fill="#B8A88A" opacity="0.45"/>
+  <circle cx="95" cy="390" r="10" fill="#B8A88A" opacity="0.45"/>
+  <circle cx="95" cy="480" r="10" fill="#B8A88A" opacity="0.45"/>
+  <path d="M510 380 C590 320, 780 310, 900 390 L900 1200 L470 1200 Z" fill="#161412" stroke="#4D4336" stroke-width="1.6"/>
+  <path d="M480 560 L900 520 L900 1200 L470 1200 Z" fill="url(#batik)"/>
+</svg>

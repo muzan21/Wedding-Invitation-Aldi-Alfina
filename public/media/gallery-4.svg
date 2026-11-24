@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" width="900" height="600">
+  <defs>
+    <radialGradient id="bw" cx="42%" cy="42%" r="65%">
+      <stop offset="0%" stop-color="#333333"/>
+      <stop offset="55%" stop-color="#171717"/>
+      <stop offset="100%" stop-color="#070707"/>
+    </radialGradient>
+  </defs>
+  <rect width="900" height="600" fill="url(#bw)"/>
+  <!-- Fine-art Monochrome Close Embrace (echoing Simanten B&W ring embrace) -->
+  <ellipse cx="350" cy="210" rx="110" ry="135" fill="#202020" stroke="#525252" stroke-width="1.5"/>
+  <ellipse cx="620" cy="190" rx="135" ry="150" fill="#121212" stroke="#383838" stroke-width="1.5"/>
+  <path d="M80 600 C180 390, 420 330, 820 380 L900 600 Z" fill="#0D0D0D" stroke="#333333" stroke-width="1.5"/>
+  <!-- Graceful hand resting on shoulder with wedding ring -->
+  <path d="M220 430 C340 315, 530 285, 690 360 C725 376, 735 415, 695 432 C565 400, 395 415, 250 510 Z" fill="#C8C8C8" opacity="0.22" stroke="#888888" stroke-width="1.2"/>
+  <circle cx="574" cy="368" r="10" fill="none" stroke="#FFFFFF" stroke-width="2.5" opacity="0.8"/>
+</svg>

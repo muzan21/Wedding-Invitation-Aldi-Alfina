@@ -1,0 +1,202 @@
+{
+  "entities": {
+    "WeddingConfig": {
+      "title": "Wedding Configuration",
+      "description": "Primary wedding invitation content, couple profiles, media URLs, music configuration, and section visibility toggles.",
+      "type": "object",
+      "properties": {
+        "groomShortName": { "type": "string", "maxLength": 80 },
+        "groomFullName": { "type": "string", "maxLength": 140 },
+        "groomChildOrder": { "type": "string", "maxLength": 80 },
+        "groomFather": { "type": "string", "maxLength": 140 },
+        "groomMother": { "type": "string", "maxLength": 140 },
+        "groomInstagram": { "type": "string", "maxLength": 200 },
+        "brideShortName": { "type": "string", "maxLength": 80 },
+        "brideFullName": { "type": "string", "maxLength": 140 },
+        "brideChildOrder": { "type": "string", "maxLength": 80 },
+        "brideFather": { "type": "string", "maxLength": 140 },
+        "brideMother": { "type": "string", "maxLength": 140 },
+        "brideInstagram": { "type": "string", "maxLength": 200 },
+        "monogramLeft": { "type": "string", "maxLength": 4 },
+        "monogramRight": { "type": "string", "maxLength": 4 },
+        "weddingDateIso": { "type": "string", "maxLength": 64 },
+        "heroDateDisplay": { "type": "string", "maxLength": 40 },
+        "weddingTitle": { "type": "string", "maxLength": 140 },
+        "weddingDescription": { "type": "string", "maxLength": 600 },
+        "countdownTitle": { "type": "string", "maxLength": 120 },
+        "verseArabic": { "type": "string", "maxLength": 1200 },
+        "verseTranslation": { "type": "string", "maxLength": 1200 },
+        "verseSurah": { "type": "string", "maxLength": 100 },
+        "openingGreetingBismillah": { "type": "string", "maxLength": 140 },
+        "openingGreetingSalam": { "type": "string", "maxLength": 180 },
+        "openingGreetingBody": { "type": "string", "maxLength": 600 },
+        "closingMessage": { "type": "string", "maxLength": 800 },
+        "closingSalam": { "type": "string", "maxLength": 180 },
+        "closingFamilyHeader": { "type": "string", "maxLength": 160 },
+        "footerBrand": { "type": "string", "maxLength": 100 },
+        "footerContact": { "type": "string", "maxLength": 80 },
+        "giftDescription": { "type": "string", "maxLength": 800 },
+        "giftShippingAddress": { "type": "string", "maxLength": 400 },
+        "giftShippingRecipient": { "type": "string", "maxLength": 140 },
+        "filterTitle": { "type": "string", "maxLength": 100 },
+        "filterDescription": { "type": "string", "maxLength": 500 },
+        "filterInstagramUrl": { "type": "string", "maxLength": 400 },
+        "desktopSplitPhoto": { "type": "string", "maxLength": 500 },
+        "heroPhoto": { "type": "string", "maxLength": 500 },
+        "groomPhoto": { "type": "string", "maxLength": 500 },
+        "bridePhoto": { "type": "string", "maxLength": 500 },
+        "eventBackdropPhoto": { "type": "string", "maxLength": 500 },
+        "wishesBackdropPhoto": { "type": "string", "maxLength": 500 },
+        "closingBackdropPhoto": { "type": "string", "maxLength": 500 },
+        "footerCouplePhoto": { "type": "string", "maxLength": 500 },
+        "musicEnabled": { "type": "boolean" },
+        "musicAutoplayOnOpen": { "type": "boolean" },
+        "musicUrl": { "type": "string", "maxLength": 500 },
+        "musicTitle": { "type": "string", "maxLength": 140 },
+        "visibility": { "type": "object" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["groomShortName", "brideShortName", "weddingDateIso", "updatedAt"]
+    },
+    "WeddingEvent": {
+      "title": "Wedding Event",
+      "description": "Scheduled ceremony or reception event displayed on the invitation.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "maxLength": 100 },
+        "dateLabel": { "type": "string", "maxLength": 100 },
+        "isoDateTime": { "type": "string", "maxLength": 64 },
+        "startTime": { "type": "string", "maxLength": 32 },
+        "endTime": { "type": "string", "maxLength": 32 },
+        "timezone": { "type": "string", "maxLength": 16 },
+        "venueSubtitle": { "type": "string", "maxLength": 140 },
+        "venueName": { "type": "string", "maxLength": 180 },
+        "address": { "type": "string", "maxLength": 400 },
+        "mapsUrl": { "type": "string", "maxLength": 500 },
+        "description": { "type": "string", "maxLength": 500 },
+        "sortOrder": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "dateLabel", "startTime", "endTime", "venueName", "address", "sortOrder", "createdAt"]
+    },
+    "DigitalGift": {
+      "title": "Digital Gift Account",
+      "description": "Bank transfer or e-wallet destination for digital wedding gifts.",
+      "type": "object",
+      "properties": {
+        "type": { "type": "string", "enum": ["bank", "ewallet"] },
+        "providerName": { "type": "string", "maxLength": 100 },
+        "accountNumber": { "type": "string", "maxLength": 60 },
+        "accountHolder": { "type": "string", "maxLength": 140 },
+        "description": { "type": "string", "maxLength": 300 },
+        "sortOrder": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["type", "providerName", "accountNumber", "accountHolder", "sortOrder", "createdAt"]
+    },
+    "GalleryPhoto": {
+      "title": "Gallery Photo",
+      "description": "Pre-wedding gallery photograph entry.",
+      "type": "object",
+      "properties": {
+        "url": { "type": "string", "maxLength": 500 },
+        "caption": { "type": "string", "maxLength": 200 },
+        "aspect": { "type": "string", "enum": ["portrait", "landscape"] },
+        "monochrome": { "type": "boolean" },
+        "sortOrder": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["url", "aspect", "monochrome", "sortOrder", "createdAt"]
+    },
+    "RsvpSubmission": {
+      "title": "RSVP Submission",
+      "description": "Guest attendance confirmation submitted from the public invitation.",
+      "type": "object",
+      "properties": {
+        "guestName": { "type": "string", "maxLength": 120 },
+        "attendance": { "type": "string", "enum": ["Hadir", "Tidak Hadir"] },
+        "attendeeCount": { "type": "number" },
+        "message": { "type": "string", "maxLength": 600 },
+        "guestSlug": { "type": "string", "maxLength": 120 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["guestName", "attendance", "attendeeCount", "createdAt"]
+    },
+    "GuestWish": {
+      "title": "Guest Wish",
+      "description": "Wedding wish and prayer submitted by guests with moderation status.",
+      "type": "object",
+      "properties": {
+        "guestName": { "type": "string", "maxLength": 120 },
+        "attendance": { "type": "string", "enum": ["Hadir", "Tidak Hadir"] },
+        "message": { "type": "string", "maxLength": 600 },
+        "status": { "type": "string", "enum": ["approved", "pending", "rejected"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["guestName", "attendance", "message", "status", "createdAt"]
+    },
+    "GuestRecord": {
+      "title": "Guest List Record",
+      "description": "Invited guest record with personalized link slug and unique QR verification token.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "maxLength": 120 },
+        "slug": { "type": "string", "maxLength": 140 },
+        "group": { "type": "string", "maxLength": 80 },
+        "phone": { "type": "string", "maxLength": 40 },
+        "maxGuests": { "type": "number" },
+        "qrToken": { "type": "string", "maxLength": 100 },
+        "checkedIn": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "slug", "maxGuests", "qrToken", "checkedIn", "createdAt"]
+    },
+    "AdminRecord": {
+      "title": "Admin Account Record",
+      "description": "Authorized administrator registry document keyed by Firebase Auth UID.",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "maxLength": 180 },
+        "displayName": { "type": "string", "maxLength": 120 },
+        "role": { "type": "string", "enum": ["admin"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["email", "role", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/wedding/{docId}": {
+      "schema": { "$ref": "#/entities/WeddingConfig" },
+      "description": "Main wedding invitation settings and content document."
+    },
+    "/events/{eventId}": {
+      "schema": { "$ref": "#/entities/WeddingEvent" },
+      "description": "Publicly readable wedding ceremony and reception schedules managed by admin."
+    },
+    "/gifts/{giftId}": {
+      "schema": { "$ref": "#/entities/DigitalGift" },
+      "description": "Publicly readable digital gift bank accounts and e-wallets managed by admin."
+    },
+    "/gallery/{photoId}": {
+      "schema": { "$ref": "#/entities/GalleryPhoto" },
+      "description": "Publicly readable pre-wedding photo gallery managed by admin."
+    },
+    "/rsvps/{rsvpId}": {
+      "schema": { "$ref": "#/entities/RsvpSubmission" },
+      "description": "Guest RSVP submissions (public create with strict validation; admin-only read/update/delete)."
+    },
+    "/wishes/{wishId}": {
+      "schema": { "$ref": "#/entities/GuestWish" },
+      "description": "Guest wishes wall (public create and approved-only read; admin moderation for all statuses)."
+    },
+    "/guests/{guestId}": {
+      "schema": { "$ref": "#/entities/GuestRecord" },
+      "description": "Private guest list and QR code registry (admin-only read and write)."
+    },
+    "/admins/{uid}": {
+      "schema": { "$ref": "#/entities/AdminRecord" },
+      "description": "Admin role registry documents (admin-only read and write)."
+    }
+  }
+}

@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1300" width="900" height="1300">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#12110F"/>
+      <stop offset="50%" stop-color="#1E1A16"/>
+      <stop offset="100%" stop-color="#090908"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="48%" r="54%">
+      <stop offset="0%" stop-color="#3E352A" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#080808" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="batik" width="42" height="42" patternUnits="userSpaceOnUse">
+      <path d="M21 4 L38 21 L21 38 L4 21 Z" fill="none" stroke="#B8A88A" stroke-width="0.75" opacity="0.3"/>
+      <circle cx="21" cy="21" r="4" fill="none" stroke="#B8A88A" stroke-width="0.6" opacity="0.3"/>
+    </pattern>
+  </defs>
+  <rect width="900" height="1300" fill="url(#bg)"/>
+  <rect width="900" height="1300" fill="url(#glow)"/>
+  <rect x="130" y="180" width="640" height="980" fill="none" stroke="#3F372E" stroke-width="10" opacity="0.65"/>
+  <path d="M260 180 Q300 660 200 1300 L440 1300 Q450 660 440 180 Z" fill="#1A1815" opacity="0.85"/>
+  <path d="M440 180 Q500 660 720 1300 L860 1300 Q720 660 660 180 Z" fill="#231E18" opacity="0.8"/>
+  <!-- Standing Couple Center Composition behind translucent pill-arch card -->
+  <ellipse cx="370" cy="430" rx="52" ry="64" fill="#1A1714" stroke="#53493B" stroke-width="1.2"/>
+  <path d="M314 414 C320 356, 420 356, 426 414 Z" fill="#26201A" stroke="#B8A88A" stroke-width="1.4" opacity="0.8"/>
+  <path d="M240 1200 L270 570 C295 520, 445 520, 470 570 L490 1200 Z" fill="#131210" stroke="#4D4336" stroke-width="1.4"/>
+  <path d="M250 860 L480 860 L490 1200 L240 1200 Z" fill="url(#batik)"/>
+  <ellipse cx="545" cy="472" rx="48" ry="60" fill="#1C1916" stroke="#53493B" stroke-width="1.2"/>
+  <path d="M446 1200 L466 600 C490 555, 600 555, 628 604 L658 1200 Z" fill="#151311" stroke="#4D4336" stroke-width="1.4"/>
+  <path d="M454 680 L638 680 L658 1200 L446 1200 Z" fill="url(#batik)"/>
+</svg>

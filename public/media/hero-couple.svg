@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1600" width="900" height="1600">
+  <defs>
+    <radialGradient id="heroBg" cx="50%" cy="42%" r="70%">
+      <stop offset="0%" stop-color="#221F1A"/>
+      <stop offset="50%" stop-color="#11100E"/>
+      <stop offset="100%" stop-color="#050505"/>
+    </radialGradient>
+    <radialGradient id="heroGlow" cx="50%" cy="46%" r="44%">
+      <stop offset="0%" stop-color="#B8A88A" stop-opacity="0.18"/>
+      <stop offset="70%" stop-color="#B8A88A" stop-opacity="0.02"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="hDrape1" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#0A0A09"/>
+      <stop offset="50%" stop-color="#1E1B16"/>
+      <stop offset="100%" stop-color="#0B0A09"/>
+    </linearGradient>
+    <linearGradient id="hDrape2" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#12110F"/>
+      <stop offset="50%" stop-color="#28241E"/>
+      <stop offset="100%" stop-color="#100F0D"/>
+    </linearGradient>
+    <linearGradient id="hSilk" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2A261F"/>
+      <stop offset="48%" stop-color="#12110F"/>
+      <stop offset="100%" stop-color="#050505"/>
+    </linearGradient>
+    <linearGradient id="hTopBottom" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#080808" stop-opacity="0.88"/>
+      <stop offset="28%" stop-color="#080808" stop-opacity="0.12"/>
+      <stop offset="76%" stop-color="#080808" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#060606" stop-opacity="0.96"/>
+    </linearGradient>
+    <pattern id="hParang" width="44" height="44" patternUnits="userSpaceOnUse" patternTransform="rotate(-24)">
+      <path d="M0 22 Q11 8 22 22 T44 22" fill="none" stroke="#B8A88A" stroke-opacity="0.22" stroke-width="1.1"/>
+      <circle cx="22" cy="22" r="1.9" fill="#B8A88A" fill-opacity="0.18"/>
+    </pattern>
+  </defs>
+
+  <rect width="900" height="1600" fill="url(#heroBg)"/>
+  <ellipse cx="450" cy="740" rx="380" ry="420" fill="url(#heroGlow)"/>
+
+  <!-- Editorial studio wooden frame & velvet drapes -->
+  <rect x="64" y="420" width="772" height="1140" fill="none" stroke="#B8A88A" stroke-opacity="0.24" stroke-width="12"/>
+  <path d="M276 410 C306 720 264 1100 288 1580 L438 1580 C422 1100 456 710 432 410 Z" fill="url(#hDrape1)"/>
+  <path d="M424 410 C456 740 422 1120 444 1580 L612 1580 C596 1110 634 720 600 410 Z" fill="url(#hDrape2)"/>
+  <path d="M584 410 C642 740 622 1120 668 1580 L832 1580 C786 1120 748 730 704 410 Z" fill="url(#hDrape1)" opacity="0.94"/>
+
+  <!-- Sculpted Bride (Left) -->
+  <g transform="translate(26, 200)">
+    <ellipse cx="220" cy="542" rx="42" ry="48" fill="#0D0C0B" stroke="#B8A88A" stroke-opacity="0.34" stroke-width="1.2"/>
+    <path d="M244 476 C284 460 328 478 338 522 C346 554 338 594 318 614 C298 632 264 630 246 606 C228 582 222 510 244 476 Z" fill="#131210" stroke="#B8A88A" stroke-opacity="0.4" stroke-width="1.2"/>
+    <g stroke="#B8A88A" stroke-opacity="0.64" fill="none">
+      <path d="M262 472 Q252 424 238 392" stroke-width="1.2"/>
+      <path d="M280 468 Q280 416 280 382" stroke-width="1.2"/>
+      <path d="M298 472 Q308 424 322 396" stroke-width="1.2"/>
+      <circle cx="238" cy="390" r="6" fill="#B8A88A" fill-opacity="0.38"/>
+      <circle cx="280" cy="380" r="6.5" fill="#B8A88A" fill-opacity="0.46"/>
+      <circle cx="322" cy="394" r="6" fill="#B8A88A" fill-opacity="0.38"/>
+    </g>
+    <path d="M260 618 C254 654 240 676 198 706 C152 740 134 818 136 926 L124 1400 L402 1400 L388 910 C382 800 356 728 320 692 C306 678 300 652 302 624 Z" fill="url(#hSilk)"/>
+    <path d="M178 746 C232 768 302 766 356 738 C378 812 388 902 396 1400 L134 1400 L146 916 C150 830 160 782 178 746 Z" fill="url(#hParang)"/>
+    <path d="M244 662 Q282 714 320 672" fill="none" stroke="#B8A88A" stroke-opacity="0.58" stroke-width="1.9"/>
+    <path d="M154 980 Q268 1004 378 968" fill="none" stroke="#B8A88A" stroke-opacity="0.46" stroke-width="5.5"/>
+  </g>
+
+  <!-- Sculpted Groom (Right) -->
+  <g transform="translate(26, 200)">
+    <path d="M402 454 C398 398 444 360 498 364 C550 368 582 406 578 468 C574 524 546 570 500 574 C450 578 408 532 402 454 Z" fill="#131210" stroke="#B8A88A" stroke-opacity="0.42" stroke-width="1.2"/>
+    <path d="M400 442 C410 384 452 354 504 358 C554 362 582 394 582 436 C546 414 446 412 400 442 Z" fill="#1E1A15" stroke="#B8A88A" stroke-opacity="0.6" stroke-width="1.4"/>
+    <path d="M450 568 L544 568 C556 604 586 626 632 648 C690 676 720 750 726 874 L744 1400 L338 1400 L352 868 C358 744 380 668 428 640 C444 628 450 600 450 568 Z" fill="url(#hSilk)"/>
+    <path d="M448 588 L496 630 L544 588" fill="none" stroke="#B8A88A" stroke-opacity="0.46" stroke-width="1.4"/>
+    <circle cx="448" cy="728" r="13" fill="#1B1813" stroke="#B8A88A" stroke-opacity="0.66" stroke-width="1.2"/>
+    <circle cx="448" cy="728" r="5.5" fill="#B8A88A" fill-opacity="0.56"/>
+    <path d="M350 1048 L728 1048 L742 1400 L338 1400 Z" fill="url(#hParang)"/>
+    <path d="M350 1048 Q538 1068 728 1048" fill="none" stroke="#B8A88A" stroke-opacity="0.4" stroke-width="1.8"/>
+  </g>
+
+  <rect width="900" height="1600" fill="url(#hTopBottom)"/>
+</svg>

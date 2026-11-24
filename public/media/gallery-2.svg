@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" width="900" height="600">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#161513"/>
+      <stop offset="100%" stop-color="#090808"/>
+    </linearGradient>
+    <pattern id="batik" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M16 3 L29 16 L16 29 L3 16 Z" fill="none" stroke="#B8A88A" stroke-width="0.7" opacity="0.32"/>
+    </pattern>
+  </defs>
+  <rect width="900" height="600" fill="url(#bg)"/>
+  <rect x="290" y="60" width="340" height="480" fill="none" stroke="#3D362D" stroke-width="7"/>
+  <path d="M400 60 Q430 300 220 580 L480 580 Q495 300 490 60 Z" fill="#1F1C18" opacity="0.9"/>
+  <path d="M490 60 Q540 300 790 580 L870 580 Q680 300 605 60 Z" fill="#28221C" opacity="0.82"/>
+  <ellipse cx="425" cy="182" rx="34" ry="42" fill="#1B1815" stroke="#5A4F40"/>
+  <path d="M366 530 L382 258 C400 230, 452 230, 468 258 L480 530 Z" fill="#131210" stroke="#4D4336"/>
+  <ellipse cx="520" cy="245" rx="32" ry="40" fill="#1D1A17" stroke="#5A4F40"/>
+  <path d="M466 530 L480 315 C500 290, 548 290, 566 318 L586 530 Z" fill="#151311" stroke="#4D4336"/>
+  <path d="M470 360 L574 360 L586 530 L466 530 Z" fill="url(#batik)"/>
+</svg>

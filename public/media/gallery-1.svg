@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800" width="600" height="800">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#171614"/>
+      <stop offset="100%" stop-color="#090908"/>
+    </linearGradient>
+    <pattern id="batik" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M16 2 L30 16 L16 30 L2 16 Z" fill="none" stroke="#B8A88A" stroke-width="0.7" opacity="0.34"/>
+    </pattern>
+  </defs>
+  <rect width="600" height="800" fill="url(#bg)"/>
+  <ellipse cx="220" cy="240" rx="44" ry="56" fill="#1E1B17" stroke="#5A4F40"/>
+  <ellipse cx="380" cy="216" rx="48" ry="58" fill="#1C1916" stroke="#5A4F40"/>
+  <path d="M332 204 C338 156, 422 156, 428 204 Z" fill="#25201A" stroke="#B8A88A" stroke-width="1.5"/>
+  <path d="M126 800 L150 365 C180 326, 265 326, 294 365 L312 800 Z" fill="#141311" stroke="#4D4336"/>
+  <path d="M134 450 L300 450 L312 800 L126 800 Z" fill="url(#batik)"/>
+  <path d="M294 800 L310 330 C342 292, 434 292, 466 334 L490 800 Z" fill="#131210" stroke="#4D4336"/>
+  <path d="M300 580 L476 580 L490 800 L294 800 Z" fill="url(#batik)"/>
+</svg>

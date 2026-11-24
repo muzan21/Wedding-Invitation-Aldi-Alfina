@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800" width="600" height="800">
+  <defs>
+    <radialGradient id="gBg" cx="50%" cy="34%" r="68%">
+      <stop offset="0%" stop-color="#27231E"/>
+      <stop offset="56%" stop-color="#131210"/>
+      <stop offset="100%" stop-color="#070707"/>
+    </radialGradient>
+    <linearGradient id="gCoat" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#29251F"/>
+      <stop offset="50%" stop-color="#141311"/>
+      <stop offset="100%" stop-color="#070707"/>
+    </linearGradient>
+    <linearGradient id="gFade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#080808" stop-opacity="0.1"/>
+      <stop offset="76%" stop-color="#080808" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#060606" stop-opacity="0.95"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="800" fill="url(#gBg)"/>
+  <!-- Soft studio halo & architectural arch -->
+  <ellipse cx="300" cy="270" rx="200" ry="220" fill="#B8A88A" opacity="0.07"/>
+  <path d="M72 780 V260 C72 128 174 44 300 44 C426 44 528 128 528 260 V780" fill="none" stroke="#B8A88A" stroke-opacity="0.22" stroke-width="1.2"/>
+
+  <!-- Sculpted Groom Chiaroscuro Portrait -->
+  <path d="M222 258 C220 198 256 164 302 164 C348 164 382 200 380 262 C378 318 352 362 300 366 C248 362 224 316 222 258 Z" fill="#141311" stroke="#B8A88A" stroke-opacity="0.46" stroke-width="1.3"/>
+  <!-- Javanese Blangkon -->
+  <path d="M218 242 C226 184 258 156 302 156 C346 156 378 184 384 240 C348 218 254 218 218 242 Z" fill="#201C16" stroke="#B8A88A" stroke-opacity="0.65" stroke-width="1.5"/>
+  <path d="M226 226 C264 206 340 206 376 226" fill="none" stroke="#B8A88A" stroke-opacity="0.34" stroke-width="1" stroke-dasharray="4 3"/>
+
+  <!-- Tailored Beskap Shoulders & Collar -->
+  <path d="M254 360 L346 360 C356 396 382 418 426 438 C482 464 510 536 516 650 L524 800 L76 800 L84 650 C90 536 118 464 174 438 C218 418 244 396 254 360 Z" fill="url(#gCoat)" stroke="#B8A88A" stroke-opacity="0.32" stroke-width="1.2"/>
+  <path d="M252 384 L300 428 L348 384" fill="none" stroke="#B8A88A" stroke-opacity="0.52" stroke-width="1.6"/>
+  <line x1="300" y1="428" x2="300" y2="790" stroke="#B8A88A" stroke-opacity="0.22" stroke-width="1.2"/>
+  <!-- Beskap ornamental buttons & lapel brooch -->
+  <circle cx="300" cy="482" r="3.5" fill="#B8A88A" fill-opacity="0.6"/>
+  <circle cx="300" cy="542" r="3.5" fill="#B8A88A" fill-opacity="0.6"/>
+  <circle cx="300" cy="602" r="3.5" fill="#B8A88A" fill-opacity="0.6"/>
+  <g transform="translate(232, 514)">
+    <circle cx="0" cy="0" r="14" fill="#1E1A15" stroke="#B8A88A" stroke-opacity="0.7" stroke-width="1.2"/>
+    <circle cx="0" cy="0" r="5.5" fill="#B8A88A" fill-opacity="0.62"/>
+  </g>
+  <rect width="600" height="800" fill="url(#gFade)"/>
+</svg>
