@@ -1,9 +1,14 @@
 import {
   collection,
   doc,
+  getDocs,
+  orderBy,
+  query,
   serverTimestamp,
   setDoc,
+  where,
 } from 'firebase/firestore';
+import localStore from '../../data/wedding-store.json';
 import { auth, db, handleFirestoreError, OperationType } from '../lib/firebase';
 import type {
   AdminBundle,
@@ -51,8 +56,49 @@ async function parseJsonOrThrow<T>(res: Response): Promise<T> {
 
 // --- Public APIs ---
 export async function fetchPublicInvitation(): Promise<InvitationBundle> {
-  const res = await fetch('/api/public/invitation');
-  return parseJsonOrThrow<InvitationBundle>(res);
+  try {
+    const res = await fetch('/api/public/invitation');
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch {
+    // Abaikan jika di Vercel (server Express tidak aktif)
+  }
+
+  const store = localStore as unknown as InvitationBundle;
+  let wishes: GuestWish[] = store.wishes || [];
+
+  try {
+    const q = query(
+      collection(db, 'wishes'),
+      where('status', '==', 'approved'),
+      orderBy('createdAt', 'desc')
+    );
+    const snap = await getDocs(q);
+    if (!snap.empty) {
+      wishes = snap.docs.map((d) => {
+        const data = d.data();
+        return {
+          id: d.id,
+          guestName: data.guestName || 'Tamu Undangan',
+          attendance: data.attendance || 'Hadir',
+          message: data.message || '',
+          status: 'approved',
+          createdAt: data.createdAt?.toDate?.()?.toISOString?.() || new Date().toISOString(),
+        };
+      });
+    }
+  } catch {
+    // Gunakan wishes bawaan dari store jika Firestore belum siap
+  }
+
+  return {
+    config: store.config,
+    events: store.events || [],
+    gifts: store.gifts || [],
+    gallery: store.gallery || [],
+    wishes,
+  };
 }
 
 export async function lookupPublicGuest(name: string): Promise<{
@@ -62,8 +108,26 @@ export async function lookupPublicGuest(name: string): Promise<{
   maxGuests?: number;
   group?: string;
 }> {
-  const res = await fetch(`/api/public/guest-lookup?name=${encodeURIComponent(name)}`);
-  return parseJsonOrThrow(res);
+  try {
+    const res = await fetch(`/api/public/guest-lookup?name=${encodeURIComponent(name)}`);
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch {
+    // Fallback ke daftar tamu di wedding-store.json saat di Vercel
+  }
+
+  const guests = ((localStore as unknown as AdminBundle).guests || []) as GuestRecord[];
+  const slug = slugifyGuestName(name);
+  const found = guests.find((g) => slugifyGuestName(g.name) === slug);
+  if (!found) return { found: false };
+  return {
+    found: true,
+    name: found.name,
+    qrToken: found.qrToken,
+    maxGuests: found.maxGuests,
+    group: found.group,
+  };
 }
 
 export async function submitPublicRsvp(payload: {
@@ -72,22 +136,53 @@ export async function submitPublicRsvp(payload: {
   attendeeCount: number;
   message: string;
 }): Promise<{ rsvp: RsvpSubmission; wish: GuestWish | null }> {
-  const res = await fetch('/api/public/rsvp', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  });
-  const result = await parseJsonOrThrow<{ rsvp: RsvpSubmission; wish: GuestWish | null }>(res);
+  const nowIso = new Date().toISOString();
+  const fallbackId = `rsvp_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+  const guestSlug = slugifyGuestName(payload.guestName);
 
-  // Best-effort mirror to Firestore using validated public-create rules
+  let result: { rsvp: RsvpSubmission; wish: GuestWish | null } = {
+    rsvp: {
+      id: fallbackId,
+      guestName: payload.guestName,
+      guestSlug,
+      attendance: payload.attendance,
+      attendeeCount: payload.attendeeCount,
+      message: payload.message,
+      createdAt: nowIso,
+    },
+    wish: payload.message.trim()
+      ? {
+          id: `wish_${fallbackId}`,
+          guestName: payload.guestName,
+          attendance: payload.attendance,
+          message: payload.message.trim(),
+          status: 'approved',
+          createdAt: nowIso,
+        }
+      : null,
+  };
+
+  try {
+    const res = await fetch('/api/public/rsvp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    if (res.ok) {
+      result = await parseJsonOrThrow<{ rsvp: RsvpSubmission; wish: GuestWish | null }>(res);
+    }
+  } catch {
+    // Di Vercel langsung simpan ke Firestore di bawah ini
+  }
+
   try {
     const rsvpRef = doc(collection(db, 'rsvps'), result.rsvp.id);
     await setDoc(rsvpRef, {
       guestName: result.rsvp.guestName,
+      guestSlug: result.rsvp.guestSlug || guestSlug,
       attendance: result.rsvp.attendance,
       attendeeCount: result.rsvp.attendeeCount,
       message: result.rsvp.message,
-      guestSlug: slugifyGuestName(result.rsvp.guestName),
       createdAt: serverTimestamp(),
     });
     if (result.wish) {
@@ -101,11 +196,10 @@ export async function submitPublicRsvp(payload: {
       });
     }
   } catch (err) {
-    // Log structured Firestore error without blocking guest confirmation
     try {
       handleFirestoreError(err, OperationType.CREATE, 'rsvps');
     } catch {
-      // Handled gracefully since primary Express store succeeded
+      // Handled gracefully
     }
   }
 
@@ -193,7 +287,6 @@ export async function updateWeddingConfig(config: WeddingConfig): Promise<Weddin
   });
   const saved = await parseJsonOrThrow<WeddingConfig>(res);
 
-  // Sync to Firestore if Firebase admin user is also signed in
   if (auth.currentUser?.emailVerified) {
     try {
       await setDoc(doc(db, 'wedding', 'main'), {
@@ -211,7 +304,9 @@ export async function updateWeddingConfig(config: WeddingConfig): Promise<Weddin
   return saved;
 }
 
-export async function createWeddingEvent(event: Omit<WeddingEvent, 'id' | 'createdAt'>): Promise<WeddingEvent> {
+export async function createWeddingEvent(
+  event: Omit<WeddingEvent, 'id' | 'createdAt'>
+): Promise<WeddingEvent> {
   const res = await fetch('/api/admin/events', {
     method: 'POST',
     headers: authHeaders(),
@@ -220,7 +315,10 @@ export async function createWeddingEvent(event: Omit<WeddingEvent, 'id' | 'creat
   return parseJsonOrThrow<WeddingEvent>(res);
 }
 
-export async function updateWeddingEvent(id: string, event: Partial<WeddingEvent>): Promise<WeddingEvent> {
+export async function updateWeddingEvent(
+  id: string,
+  event: Partial<WeddingEvent>
+): Promise<WeddingEvent> {
   const res = await fetch(`/api/admin/events/${encodeURIComponent(id)}`, {
     method: 'PUT',
     headers: authHeaders(),
@@ -237,7 +335,9 @@ export async function deleteWeddingEvent(id: string): Promise<void> {
   await parseJsonOrThrow(res);
 }
 
-export async function createDigitalGift(gift: Omit<DigitalGift, 'id' | 'createdAt' | 'sortOrder'>): Promise<DigitalGift> {
+export async function createDigitalGift(
+  gift: Omit<DigitalGift, 'id' | 'createdAt' | 'sortOrder'>
+): Promise<DigitalGift> {
   const res = await fetch('/api/admin/gifts', {
     method: 'POST',
     headers: authHeaders(),
@@ -246,7 +346,10 @@ export async function createDigitalGift(gift: Omit<DigitalGift, 'id' | 'createdA
   return parseJsonOrThrow<DigitalGift>(res);
 }
 
-export async function updateDigitalGift(id: string, gift: Partial<DigitalGift>): Promise<DigitalGift> {
+export async function updateDigitalGift(
+  id: string,
+  gift: Partial<DigitalGift>
+): Promise<DigitalGift> {
   const res = await fetch(`/api/admin/gifts/${encodeURIComponent(id)}`, {
     method: 'PUT',
     headers: authHeaders(),
@@ -263,7 +366,9 @@ export async function deleteDigitalGift(id: string): Promise<void> {
   await parseJsonOrThrow(res);
 }
 
-export async function createGalleryPhoto(photo: Omit<GalleryPhoto, 'id' | 'createdAt' | 'sortOrder'>): Promise<GalleryPhoto> {
+export async function createGalleryPhoto(
+  photo: Omit<GalleryPhoto, 'id' | 'createdAt' | 'sortOrder'>
+): Promise<GalleryPhoto> {
   const res = await fetch('/api/admin/gallery', {
     method: 'POST',
     headers: authHeaders(),
@@ -319,7 +424,9 @@ export async function createGuestRecord(guest: {
   return parseJsonOrThrow<GuestRecord>(res);
 }
 
-export async function importGuestsFromCsv(csv: string): Promise<{ imported: number; guests: GuestRecord[] }> {
+export async function importGuestsFromCsv(
+  csv: string
+): Promise<{ imported: number; guests: GuestRecord[] }> {
   const res = await fetch('/api/admin/guests/import-csv', {
     method: 'POST',
     headers: authHeaders(),
@@ -328,7 +435,10 @@ export async function importGuestsFromCsv(csv: string): Promise<{ imported: numb
   return parseJsonOrThrow<{ imported: number; guests: GuestRecord[] }>(res);
 }
 
-export async function updateGuestRecord(id: string, guest: Partial<GuestRecord>): Promise<GuestRecord> {
+export async function updateGuestRecord(
+  id: string,
+  guest: Partial<GuestRecord>
+): Promise<GuestRecord> {
   const res = await fetch(`/api/admin/guests/${encodeURIComponent(id)}`, {
     method: 'PUT',
     headers: authHeaders(),
@@ -416,7 +526,9 @@ export async function uploadAdminImage(file: File): Promise<{ url: string; filen
   return parseJsonOrThrow<{ url: string; filename: string }>(res);
 }
 
-export async function uploadAdminAudio(file: File): Promise<{ url: string; filename: string; originalName: string }> {
+export async function uploadAdminAudio(
+  file: File
+): Promise<{ url: string; filename: string; originalName: string }> {
   const form = new FormData();
   form.append('file', file);
   const headers: Record<string, string> = {};
