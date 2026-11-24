@@ -22,11 +22,7 @@ export const ScrollReveal: React.FC<ScrollRevealProps> = ({
     const el = ref.current;
     if (!el) return;
 
-    const prefersReduced =
-      typeof window !== 'undefined' &&
-      window.matchMedia &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReduced || typeof IntersectionObserver === 'undefined') {
+    if (typeof IntersectionObserver === 'undefined') {
       setVisible(true);
       return;
     }
@@ -36,32 +32,43 @@ export const ScrollReveal: React.FC<ScrollRevealProps> = ({
         for (const entry of entries) {
           if (entry.isIntersecting) {
             setVisible(true);
-            observer.unobserve(el);
+            observer.unobserve(entry.target);
+            break;
           }
         }
       },
-      { threshold: 0.12, rootMargin: '0px 0px -30px 0px' }
+      {
+        threshold: 0.05,
+        rootMargin: '0px 0px -15px 0px',
+      }
     );
+
     observer.observe(el);
     return () => observer.disconnect();
   }, []);
 
   const hiddenTransform =
     direction === 'up'
-      ? 'translate-y-7'
+      ? 'translate3d(0, 28px, 0)'
       : direction === 'down'
-      ? '-translate-y-7'
+      ? 'translate3d(0, -28px, 0)'
       : direction === 'scale'
-      ? 'scale-95'
-      : '';
+      ? 'scale3d(0.96, 0.96, 1)'
+      : 'translate3d(0, 0, 0)';
 
   return (
     <div
       ref={ref}
-      style={{ transitionDelay: `${delayMs}ms` }}
-      className={`transition-all duration-700 ease-out will-change-transform ${
-        visible ? 'opacity-100 translate-y-0 scale-100' : `opacity-0 ${hiddenTransform}`
-      } ${className}`}
+      style={{
+        opacity: visible ? 1 : 0,
+        transform: visible ? 'translate3d(0, 0, 0)' : hiddenTransform,
+        transitionProperty: 'transform, opacity',
+        transitionDuration: '700ms',
+        transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1)',
+        transitionDelay: `${delayMs}ms`,
+        willChange: 'transform, opacity',
+      }}
+      className={className}
     >
       {children}
     </div>
