@@ -14,29 +14,35 @@ export const GuestLinkTab: React.FC = () => {
     ? `${baseUrl}/?to=${encodeURIComponent(trimmedName)}`
     : '';
 
-  const handleCopy = async () => {
-    if (!generatedLink) return;
+  // Format pesan undangan otomatis untuk Aldi & Alfina
+  const invitationMessage = trimmedName
+    ? `Kepada Yth. Bapak/Ibu/Saudara/i ${trimmedName},\n\nTanpa mengurangi rasa hormat, perkenankan kami mengundang Anda untuk menghadiri pernikahan kami:\n\nAldi Alfariz & Alfina Damayanti\n\nBerikut tautan undangan digital kami:\n${generatedLink}\n\nMerupakan suatu kehormatan & kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu.\n\nTerima kasih.`
+    : '';
+
+  const copyToClipboard = async (text: string) => {
     try {
-      await navigator.clipboard.writeText(generatedLink);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      await navigator.clipboard.writeText(text);
     } catch {
-      // Fallback jika clipboard API diblokir
       const textarea = document.createElement('textarea');
-      textarea.value = generatedLink;
+      textarea.value = text;
       document.body.appendChild(textarea);
       textarea.select();
       document.execCommand('copy');
       document.body.removeChild(textarea);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
     }
   };
 
+  // Menyalin teks pesan lengkap beserta link undangan
+  const handleCopy = async () => {
+    if (!invitationMessage) return;
+    await copyToClipboard(invitationMessage);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   const handleShareWhatsApp = () => {
-    if (!generatedLink) return;
-    const message = `Kepada Yth. ${trimmedName},\n\nTanpa mengurangi rasa hormat, perkenankan kami mengundang Bapak/Ibu/Saudara/i untuk hadir dalam acara pernikahan kami.\n\nInfo lengkap & undangan digital:\n${generatedLink}\n\nTerima kasih.`;
-    window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
+    if (!invitationMessage) return;
+    window.open(`https://wa.me/?text=${encodeURIComponent(invitationMessage)}`, '_blank');
   };
 
   return (
@@ -44,7 +50,7 @@ export const GuestLinkTab: React.FC = () => {
       <div>
         <h2 className="text-xl font-serif text-[#e6b880]">Generator Link Tamu</h2>
         <p className="text-sm text-neutral-400 mt-1">
-          Ketik nama tamu di bawah ini, link undangan khusus akan langsung dibuat secara otomatis.
+          Ketik nama tamu di bawah ini, link dan pesan undangan otomatis akan langsung siap disalin atau dikirim ke WhatsApp.
         </p>
       </div>
 
@@ -85,7 +91,7 @@ export const GuestLinkTab: React.FC = () => {
             <button
               type="button"
               onClick={handleCopy}
-              disabled={!generatedLink}
+              disabled={!invitationMessage}
               className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium bg-[#e6b880] text-black hover:bg-[#d8a76c] disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
             >
               {copied ? (
@@ -96,7 +102,7 @@ export const GuestLinkTab: React.FC = () => {
               ) : (
                 <>
                   <Copy className="w-4 h-4" />
-                  Salin Link
+                  Salin Pesan
                 </>
               )}
             </button>
@@ -104,13 +110,24 @@ export const GuestLinkTab: React.FC = () => {
             <button
               type="button"
               onClick={handleShareWhatsApp}
-              disabled={!generatedLink}
+              disabled={!invitationMessage}
               className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium bg-emerald-600 text-white hover:bg-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
             >
               <Send className="w-4 h-4" />
               Kirim WA
             </button>
           </div>
+        </div>
+
+        {/* Preview Pesan Otomatis */}
+        <div>
+          <label className="block text-sm font-medium text-neutral-300 mb-2">
+            Preview Pesan Otomatis
+          </label>
+          <pre className="w-full bg-[#111111] border border-neutral-800 rounded-lg p-4 text-xs sm:text-sm text-neutral-300 whitespace-pre-wrap font-sans leading-relaxed">
+            {invitationMessage ||
+              'Ketik nama tamu di atas untuk melihat pratinjau pesan undangan otomatis...'}
+          </pre>
         </div>
       </div>
     </div>
