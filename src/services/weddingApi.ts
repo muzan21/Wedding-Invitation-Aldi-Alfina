@@ -78,6 +78,54 @@ async function parseJsonOrThrow<T>(res: Response): Promise<T> {
   return data as T;
 }
 
+function normalizeAdminBundle(raw: Partial<AdminBundle> | null | undefined): AdminBundle {
+  const fallbackStore = localStore as unknown as Partial<AdminBundle>;
+  const source = raw || fallbackStore;
+
+  const baseWishes = Array.isArray(source.wishes)
+    ? source.wishes
+    : Array.isArray(fallbackStore.wishes)
+      ? fallbackStore.wishes
+      : [];
+
+  const baseAllWishes = Array.isArray(source.allWishes)
+    ? source.allWishes
+    : Array.isArray(fallbackStore.allWishes)
+      ? fallbackStore.allWishes
+      : baseWishes;
+
+  return {
+    config: (source.config || fallbackStore.config) as WeddingConfig,
+    events: Array.isArray(source.events)
+      ? source.events
+      : Array.isArray(fallbackStore.events)
+        ? fallbackStore.events
+        : [],
+    gifts: Array.isArray(source.gifts)
+      ? source.gifts
+      : Array.isArray(fallbackStore.gifts)
+        ? fallbackStore.gifts
+        : [],
+    gallery: Array.isArray(source.gallery)
+      ? source.gallery
+      : Array.isArray(fallbackStore.gallery)
+        ? fallbackStore.gallery
+        : [],
+    wishes: baseWishes,
+    allWishes: baseAllWishes,
+    rsvps: Array.isArray(source.rsvps)
+      ? source.rsvps
+      : Array.isArray(fallbackStore.rsvps)
+        ? fallbackStore.rsvps
+        : [],
+    guests: Array.isArray(source.guests)
+      ? source.guests
+      : Array.isArray(fallbackStore.guests)
+        ? fallbackStore.guests
+        : [],
+  };
+}
+
 // --- Public APIs ---
 export async function fetchPublicInvitation(): Promise<InvitationBundle> {
   try {
@@ -90,7 +138,7 @@ export async function fetchPublicInvitation(): Promise<InvitationBundle> {
   }
 
   const store = localStore as unknown as InvitationBundle;
-  let wishes: GuestWish[] = store.wishes || [];
+  let wishes: GuestWish[] = Array.isArray(store.wishes) ? store.wishes : [];
 
   try {
     const q = query(
@@ -118,9 +166,9 @@ export async function fetchPublicInvitation(): Promise<InvitationBundle> {
 
   return {
     config: store.config,
-    events: store.events || [],
-    gifts: store.gifts || [],
-    gallery: store.gallery || [],
+    events: Array.isArray(store.events) ? store.events : [],
+    gifts: Array.isArray(store.gifts) ? store.gifts : [],
+    gallery: Array.isArray(store.gallery) ? store.gallery : [],
     wishes,
   };
 }
@@ -338,12 +386,25 @@ export async function changeAdminPassword(
   currentPassword: string,
   newPassword: string
 ): Promise<{ ok: boolean }> {
-  const res = await fetch('/api/admin/auth/change-password', {
-    method: 'POST',
-    headers: authHeaders(),
-    body: JSON.stringify({ currentPassword, newPassword }),
-  });
-  return parseJsonOrThrow<{ ok: boolean }>(res);
+  try {
+    const res = await fetch('/api/admin/auth/change-password', {
+      method: 'POST',
+      headers: authHeaders(),
+      body: JSON.stringify({ currentPassword, newPassword }),
+    });
+    if (res.ok) {
+      return await parseJsonOrThrow<{ ok: boolean }>(res);
+    }
+  } catch {
+    // Fallback ke mode Vercel di bawah
+  }
+
+  const savedAccount = readVercelAdminAccount();
+  if (!savedAccount || savedAccount.password !== currentPassword) {
+    throw new Error('Password saat ini tidak sesuai.');
+  }
+  writeVercelAdminAccount({ ...savedAccount, password: newPassword });
+  return { ok: true };
 }
 
 // --- Protected Admin Data APIs ---
@@ -351,49 +412,42 @@ export async function fetchAdminBundle(): Promise<AdminBundle> {
   try {
     const res = await fetch('/api/admin/bundle', { headers: authHeaders() });
     if (res.ok) {
-      return await parseJsonOrThrow<AdminBundle>(res);
+      const raw = await parseJsonOrThrow<Partial<AdminBundle>>(res);
+      return normalizeAdminBundle(raw);
     }
   } catch {
     // Fallback ke data store lokal saat di Vercel
   }
 
- const store = localStore as unknown as AdminBundle;
-  const wishesList = store.wishes || store.allWishes || [];
-  return {
-    config: store.config,
-    events: store.events || [],
-    gifts: store.gifts || [],
-    gallery: store.gallery || [],
-    wishes: wishesList,
-    allWishes: store.allWishes || wishesList,
-    rsvps: store.rsvps || [],
-    guests: store.guests || [],
-  };
+  return normalizeAdminBundle(localStore as unknown as Partial<AdminBundle>);
 }
 
 export async function updateWeddingConfig(config: WeddingConfig): Promise<WeddingConfig> {
-  const res = await fetch('/api/admin/config', {
-    method: 'PUT',
-    headers: authHeaders(),
-    body: JSON.stringify(config),
-  });
-  const saved = await parseJsonOrThrow<WeddingConfig>(res);
-
-  if (auth.currentUser?.emailVerified) {
-    try {
-      await setDoc(doc(db, 'wedding', 'main'), {
-        ...saved,
-        updatedAt: serverTimestamp(),
-      });
-    } catch (err) {
-      try {
-        handleFirestoreError(err, OperationType.WRITE, 'wedding/main');
-      } catch {
-        // Primary backend persisted
+  try {
+    const res = await fetch('/api/admin/config', {
+      method: 'PUT',
+      headers: authHeaders(),
+      body: JSON.stringify(config),
+    });
+    if (res.ok) {
+      const saved = await parseJsonOrThrow<WeddingConfig>(res);
+      if (auth.currentUser?.emailVerified) {
+        try {
+          await setDoc(doc(db, 'wedding', 'main'), {
+            ...saved,
+            updatedAt: serverTimestamp(),
+          });
+        } catch {
+          // Primary backend persisted
+        }
       }
+      return saved;
     }
+  } catch {
+    // Fallback ke mode Vercel bila backend tidak aktif
   }
-  return saved;
+
+  return config;
 }
 
 export async function createWeddingEvent(

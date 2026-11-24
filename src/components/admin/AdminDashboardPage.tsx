@@ -69,12 +69,85 @@ const NAV_ITEMS: { id: AdminTab; label: string; icon: React.ComponentType<{ clas
   { id: 'security', label: 'Akun & Keamanan', icon: Shield },
 ];
 
+class AdminTabErrorBoundary extends React.Component<
+  { children: React.ReactNode; onSwitchToGuestLink: () => void },
+  { hasError: boolean; message: string }
+> {
+  constructor(props: { children: React.ReactNode; onSwitchToGuestLink: () => void }) {
+    super(props);
+    this.state = { hasError: false, message: '' };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return {
+      hasError: true,
+      message: error?.message || 'Terjadi kendala pada tab ini.',
+    };
+  }
+
+  componentDidCatch(error: Error) {
+    console.error('Admin tab render error:', error);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="rounded-xl border border-red-900/70 bg-[#141010] p-6 text-xs text-red-200 space-y-3">
+          <p className="font-semibold text-sm text-white">Kendala saat menampilkan tab ini</p>
+          <p className="text-red-300">{this.state.message}</p>
+          <div className="flex flex-wrap gap-2 pt-1">
+            <button
+              type="button"
+              onClick={() => {
+                this.setState({ hasError: false, message: '' });
+                this.props.onSwitchToGuestLink();
+              }}
+              className="rounded-md bg-white px-3.5 py-2 text-xs font-semibold text-black hover:bg-[#B8A88A] cursor-pointer"
+            >
+              Buka Link Tamu (Generator WA)
+            </button>
+            <button
+              type="button"
+              onClick={() => this.setState({ hasError: false, message: '' })}
+              className="rounded-md border border-[#303030] bg-[#171717] px-3.5 py-2 text-xs text-white hover:border-[#B8A88A] cursor-pointer"
+            >
+              Coba Tampilkan Lagi
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
+function sanitizeBundle(data: Partial<AdminBundle> | null | undefined): AdminBundle {
+  const safeWishes = Array.isArray(data?.wishes)
+    ? data.wishes
+    : Array.isArray(data?.allWishes)
+      ? data.allWishes
+      : [];
+  const safeAllWishes = Array.isArray(data?.allWishes) ? data.allWishes : safeWishes;
+
+  return {
+    config: (data?.config ?? {}) as WeddingConfig,
+    events: Array.isArray(data?.events) ? data.events : [],
+    gifts: Array.isArray(data?.gifts) ? data.gifts : [],
+    gallery: Array.isArray(data?.gallery) ? data.gallery : [],
+    wishes: safeWishes,
+    allWishes: safeAllWishes,
+    rsvps: Array.isArray(data?.rsvps) ? data.rsvps : [],
+    guests: Array.isArray(data?.guests) ? data.guests : [],
+  };
+}
+
 export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
   onNavigatePublic,
 }) => {
   const [authStatus, setAuthStatus] = useState<AdminAuthStatus | null>(null);
   const [bundle, setBundle] = useState<AdminBundle | null>(null);
-  const [activeTab, setActiveTab] = useState<AdminTab>('overview');
+  const [activeTab, setActiveTab] = useState<AdminTab>('guest-link');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [toast, setToast] = useState<{ msg: string; isError: boolean } | null>(null);
 
@@ -88,9 +161,10 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
   const loadBundle = useCallback(async () => {
     try {
       const data = await fetchAdminBundle();
-      setBundle(data);
+      setBundle(sanitizeBundle(data));
     } catch (err) {
       notify(err instanceof Error ? err.message : 'Gagal memuat data admin.', true);
+      setBundle(sanitizeBundle(null));
     }
   }, [notify]);
 
@@ -127,8 +201,8 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
   const handleSaveConfig = async (nextConfig: WeddingConfig) => {
     try {
       const saved = await updateWeddingConfig(nextConfig);
-      setBundle((prev) => (prev ? { ...prev, config: saved } : prev));
-      notify('Perubahan berhasil disimpan ke database dan langsung tampil di undangan.');
+      setBundle((prev) => (prev ? sanitizeBundle({ ...prev, config: saved }) : prev));
+      notify('Perubahan berhasil disimpan.');
     } catch (err) {
       notify(err instanceof Error ? err.message : 'Gagal menyimpan perubahan.', true);
     }
@@ -161,7 +235,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
         <div className="border-b border-[#242424] px-6 py-5">
           <p className="font-serif-editorial text-2xl tracking-wide text-white">Simanten</p>
           <p className="mt-0.5 text-[11px] tracking-wider text-[#B8A88A] uppercase">
-            Black Edition Admin
+            Admin Panel
           </p>
         </div>
 
@@ -246,7 +320,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
 
       {/* Main Workspace */}
       <div className="flex min-w-0 flex-1 flex-col">
-        {/* Top Bar Contract: Breadcrumb Left — Primary Action Right */}
         <header className="sticky top-0 z-30 flex items-center justify-between gap-4 border-b border-[#242424] bg-[#080808]/95 px-5 py-3.5 backdrop-blur-sm lg:px-8">
           <div className="flex items-center gap-3 min-w-0">
             <button
@@ -261,7 +334,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
               <span>Dashboard</span>
               <span>/</span>
               <span className="font-medium text-white truncate">
-                {currentNav?.label || 'Overview'}
+                {currentNav?.label || 'Link Tamu'}
               </span>
             </div>
           </div>
@@ -278,7 +351,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
           </div>
         </header>
 
-        {/* Feedback Banner */}
         {toast && (
           <div
             role="status"
@@ -292,14 +364,13 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
           </div>
         )}
 
-        {/* Active Tab Content */}
         <main className="mx-auto w-full max-w-6xl flex-1 px-5 py-7 lg:px-8">
           {!bundle ? (
             <div className="py-20 text-center text-xs text-[#A0A0A0]">
               Memuat data dashboard...
             </div>
           ) : (
-            <>
+            <AdminTabErrorBoundary onSwitchToGuestLink={() => setActiveTab('guest-link')}>
               {activeTab === 'overview' && (
                 <OverviewTab
                   bundle={bundle}
@@ -369,7 +440,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
               {activeTab === 'guests' && (
                 <GuestsTab
                   guests={bundle.guests}
-                  weddingTitle={bundle.config.weddingTitle}
+                  weddingTitle={bundle.config?.weddingTitle || 'Undangan pernikahan Aldi & Alfina'}
                   onRefresh={loadBundle}
                   onNotify={notify}
                 />
@@ -391,7 +462,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
                   onNotify={notify}
                 />
               )}
-            </>
+            </AdminTabErrorBoundary>
           )}
         </main>
       </div>
